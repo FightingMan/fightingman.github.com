@@ -1,0 +1,90 @@
+<div class="highlight"><pre><span class="kd">class</span> <span class="nc">A</span> <span class="o">{</span>
+    <span class="kd">interface</span> <span class="nc">B</span> <span class="o">{</span>
+        <span class="kt">void</span> <span class="nf">f</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BImp</span> <span class="kd">implements</span> <span class="n">B</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">BImp2</span> <span class="kd">implements</span> <span class="n">B</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">C</span> <span class="o">{</span>
+        <span class="kt">void</span> <span class="nf">f</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="kd">class</span> <span class="nc">CImp</span> <span class="kd">implements</span> <span class="n">C</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">CImp2</span> <span class="kd">implements</span> <span class="n">C</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">private</span> <span class="kd">interface</span> <span class="nc">D</span> <span class="o">{</span>
+        <span class="kt">void</span> <span class="nf">f</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">DImp</span> <span class="kd">implements</span> <span class="n">D</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">DImp2</span> <span class="kd">implements</span> <span class="n">D</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="n">D</span> <span class="nf">getD</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="k">new</span> <span class="n">DImp2</span><span class="o">();</span> <span class="o">}</span>
+    <span class="kd">private</span> <span class="n">D</span> <span class="n">dRef</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receiveD</span><span class="o">(</span><span class="n">D</span> <span class="n">d</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">dRef</span> <span class="o">=</span> <span class="n">d</span><span class="o">;</span>
+        <span class="n">dRef</span><span class="o">.</span><span class="na">f</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">E</span> <span class="o">{</span>
+    <span class="kd">interface</span> <span class="nc">G</span> <span class="o">{</span>
+        <span class="kt">void</span> <span class="nf">f</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="c1">// Redundant &quot;public&quot;:</span>
+    <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">H</span> <span class="o">{</span>
+        <span class="kt">void</span> <span class="nf">f</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="kt">void</span> <span class="nf">g</span><span class="o">();</span>
+    <span class="c1">// Cannot be private within an interface:</span>
+    <span class="c1">//! private interface I {}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">NestingInterfaces</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BImp</span> <span class="kd">implements</span> <span class="n">A</span><span class="o">.</span><span class="na">B</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">class</span> <span class="nc">CImp</span> <span class="kd">implements</span> <span class="n">A</span><span class="o">.</span><span class="na">C</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="c1">// Cannot implement a private interface except</span>
+    <span class="c1">// within that interface’s defining class:</span>
+    <span class="c1">//! class DImp implements A.D {</span>
+    <span class="c1">//! public void f() {}</span>
+    <span class="c1">//! }</span>
+    <span class="kd">class</span> <span class="nc">EImp</span> <span class="kd">implements</span> <span class="n">E</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">class</span> <span class="nc">EGImp</span> <span class="kd">implements</span> <span class="n">E</span><span class="o">.</span><span class="na">G</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">class</span> <span class="nc">EImp2</span> <span class="kd">implements</span> <span class="n">E</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+    <span class="kd">class</span> <span class="nc">EG</span> <span class="kd">implements</span> <span class="n">E</span><span class="o">.</span><span class="na">G</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">A</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="o">();</span>
+        <span class="c1">// Can’t access A.D:</span>
+        <span class="c1">//! A.D ad = a.getD();</span>
+        <span class="c1">// Doesn’t return anything but A.D:</span>
+        <span class="c1">//! A.DImp2 di2 = a.getD();</span>
+        <span class="c1">// Cannot access a member of the interface:</span>
+        <span class="c1">//! a.getD().f();</span>
+        <span class="c1">// Only another A can do anything with getD():</span>
+        <span class="n">A</span> <span class="n">a2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="o">();</span>
+        <span class="n">a2</span><span class="o">.</span><span class="na">receiveD</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="na">getD</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+ <span class="c1">///:~</span>
+</pre>
+</div>

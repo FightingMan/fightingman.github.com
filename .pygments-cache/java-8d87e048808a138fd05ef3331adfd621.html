@@ -1,0 +1,17 @@
+<div class="highlight"><pre>        <span class="kd">class</span> <span class="nc">sup</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">24</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">sup</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">12</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">pitfallTwo</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">sup</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">age</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span><span class="c1">//output:24;</span>
+    
+</pre>
+</div>

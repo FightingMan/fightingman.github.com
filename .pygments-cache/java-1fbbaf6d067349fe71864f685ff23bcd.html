@@ -1,0 +1,16 @@
+<div class="highlight"><pre>        <span class="kd">class</span> <span class="nc">sup</span> <span class="o">{}</span>
+
+        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">sup</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">only</span><span class="o">()</span> <span class="o">{}</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">class</span> <span class="nf">Downcast</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">sup</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
+                <span class="c1">//!s.only() compile time : method not found in sup;</span>
+                <span class="o">((</span><span class="n">sub</span><span class="o">)</span><span class="n">s</span><span class="o">).</span><span class="na">only</span><span class="o">();</span><span class="c1">// Downcast/runtime type information.</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    
+</pre>
+</div>

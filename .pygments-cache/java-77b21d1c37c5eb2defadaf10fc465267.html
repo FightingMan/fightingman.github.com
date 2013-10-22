@@ -1,0 +1,39 @@
+<div class="highlight"><pre>        <span class="kd">class</span> <span class="nc">Grain</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="s">&quot;Grain&quot;</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="kd">class</span> <span class="nc">Wheat</span> <span class="kd">extends</span> <span class="nf">Grain</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="s">&quot;Wheat&quot;</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        
+        <span class="kd">class</span> <span class="nc">Mill</span> <span class="o">{</span>
+            <span class="n">Grain</span> <span class="nf">process</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="k">new</span> <span class="nf">Grain</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="kd">class</span> <span class="nc">WheatMill</span> <span class="kd">extends</span> <span class="n">Mill</span> <span class="o">{</span>
+            <span class="n">Wheat</span> <span class="nf">process</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="k">new</span> <span class="nf">Wheat</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">CovariantReturn</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">Mill</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Mill</span><span class="o">();</span>
+                <span class="n">Grain</span> <span class="n">g</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">process</span><span class="o">();</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WheatMill</span><span class="o">();</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">process</span><span class="o">;</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span><span class="c1">//output:</span>
+        <span class="n">Grain</span>
+        <span class="n">Wheat</span>
+    
+</pre>
+</div>

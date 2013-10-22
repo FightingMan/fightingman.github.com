@@ -1,0 +1,32 @@
+<div class="highlight"><pre>	<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">Z_STRLEN_P</span><span class="p">(</span><span class="n">arg</span><span class="p">);</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">c</span> <span class="o">=</span> <span class="o">*</span><span class="n">s</span><span class="o">++</span><span class="p">;</span>
+
+		<span class="cm">/* might not work for EBCDIC */</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span> 
+			<span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+		<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;A&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;Z&#39;</span><span class="p">)</span> 
+			<span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;A&#39;</span> <span class="o">-</span> <span class="mi">10</span><span class="p">;</span>
+		<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;a&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;z&#39;</span><span class="p">)</span> 
+			<span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;a&#39;</span> <span class="o">-</span> <span class="mi">10</span><span class="p">;</span>
+		<span class="k">else</span>
+			<span class="k">continue</span><span class="p">;</span> <span class="c1">//Evil continue...</span>
+
+		<span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="n">base</span><span class="p">)</span>
+			<span class="k">continue</span><span class="p">;</span>
+		
+		<span class="k">switch</span> <span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">case</span> <span class="mi">0</span>: <span class="cm">/* Integer */</span>
+			<span class="k">if</span> <span class="p">(</span><span class="n">num</span> <span class="o">&lt;</span> <span class="n">cutoff</span> <span class="o">||</span> <span class="p">(</span><span class="n">num</span> <span class="o">==</span> <span class="n">cutoff</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="n">cutlim</span><span class="p">))</span> <span class="p">{</span>
+				<span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">*</span> <span class="n">base</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span>
+				<span class="k">break</span><span class="p">;</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="n">fnum</span> <span class="o">=</span> <span class="n">num</span><span class="p">;</span>
+				<span class="n">mode</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="cm">/* fall-through */</span>
+		<span class="k">case</span> <span class="mi">1</span>: <span class="cm">/* Float */</span>
+			<span class="n">fnum</span> <span class="o">=</span> <span class="n">fnum</span> <span class="o">*</span> <span class="n">base</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span>
+		<span class="p">}</span>	
+	<span class="p">}</span>
+</pre>
+</div>

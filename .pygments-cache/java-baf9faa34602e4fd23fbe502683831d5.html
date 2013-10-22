@@ -1,0 +1,24 @@
+<div class="highlight"><pre><span class="kd">class</span> <span class="nc">Instrument</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Instrument.play()&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Wind</span> <span class="kd">extends</span> <span class="n">Instrument</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Wind.play()&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Music</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">tune</span><span class="o">(</span><span class="n">Instrument</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">i</span><span class="o">.</span><span class="na">draw</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Wind</span> <span class="n">w</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Wind</span><span class="o">();</span>
+        <span class="n">tune</span><span class="o">(</span><span class="n">w</span><span class="o">);</span> <span class="c1">// upcasting</span>
+    <span class="o">}</span>
+<span class="o">}</span><span class="c1">//Output: Wind.play()</span>
+</pre>
+</div>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Shell | FightingMan's FootPrints]]></title>
+  <link href="http://FightingMan.github.com/blog/categories/shell/atom.xml" rel="self"/>
+  <link href="http://FightingMan.github.com/"/>
+  <updated>2013-10-22T11:58:50+08:00</updated>
+  <id>http://FightingMan.github.com/</id>
+  <author>
+    <name><![CDATA[FightingMan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Shell Tips with Ctrl+(?)]]></title>
+    <link href="http://FightingMan.github.com/blog/2013/03/13/shell-tips-with-ctrl-plus/"/>
+    <updated>2013-03-13T23:59:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2013/03/13/shell-tips-with-ctrl-plus</id>
+    <content type="html"><![CDATA[<p>There are some handy operator with command line:</p>
+
+<pre><code>[Ctrl-d] #This exits shell or closes input on programs waiting for STDIN.NOTE: there must be no such thing as an end of file character.
+[Ctrl-z] #This suspend a process u r running in foreground. Get it back by running 'fg', background it using 'bg'.
+[Ctrl-c] #This canceling a running program,Ctrl-C can be used before you run cammand to "cancel" the line edit and start anew.
+[Ctrl-b] #Move to the begging of the current or previous word. NOTE: base on keyboard mapping sometimes.
+[Ctrl-f] #Move to the end of the current or next word. NOTE: base on keyboard mapping sometimes.
+[Ctrl-w] #Remove the previous word.
+[Ctrl-l] #Clear screen.
+[Ctrl-K] #Delete/Yank everything from cursor to the end of line.
+[Ctrl-U] #Delete/Yank everything from cursor to the begging of the line.
+[Ctrl-e] #Move your cursor to the end of the line.
+[Ctrl-a] #move your cursor to the begging of the line.
+[Ctrl-r] #Reverse search through your command history for 'input'. ESC when done.
+[Ctrl--] #Manial lists this as Ctrl-_ but Ctrl-- ususally works too.Incremental undo of command line edits.
+</code></pre>
+
+<p>Look forward to your supplementary :).</p>
+]]></content>
+  </entry>
+  
+</feed>
