@@ -9,7 +9,49 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Complete decoupling. Whenever a method works with a class instead of an interface, you are limited to using that class or its subclass. If you would &hellip;">
+  <meta name="description" content="Pitfall.java 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+interface I1 { &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +106,141 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/14/name-collisions-when-combining/">Name Collisions When Combining</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-14T21:16:00+08:00" pubdate data-updated="true">Nov 14<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/14/name-collisions-when-combining/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+
+<figure class='code'><figcaption><span>Pitfall.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">I1</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">f</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">interface</span> <span class="nc">I2</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">f</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">interface</span> <span class="nc">I3</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">f</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">C</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">C2</span> <span class="kd">implements</span> <span class="n">I1</span><span class="o">,</span> <span class="n">I2</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">f</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">C3</span> <span class="kd">extends</span> <span class="n">C</span> <span class="kd">implements</span> <span class="n">I2</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">f</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">C4</span> <span class="kd">extends</span> <span class="n">C</span> <span class="kd">implements</span> <span class="n">I3</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="cm">/**error:</span>
+</span><span class='line'><span class="cm">*class C5 extends C implements I1 {}</span>
+</span><span class='line'><span class="cm">*class I4 extends I1,I3 {}</span>
+</span><span class='line'><span class="cm">*class C6 extends I2,I3 {} </span>
+</span><span class='line'><span class="cm">*/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I think there are three rules at least:</p>
+
+<blockquote><ol>
+<li>Methods differ isn&#8217;t only by return type.</li>
+<li>When a derived class do inherit from a class with implements interface,if the method have a method with same name,these methods must have same return type.</li>
+<li>When a class implements interfaces,the methods which have same name must have its own return type and method signature.</li>
+</ol>
+</blockquote>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -404,99 +581,6 @@ the bass class without change the third class&#8217;s method.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/26/late-binding-and-upcast/">Late Binding &amp; Upcasting</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-26T19:08:00+08:00" pubdate data-updated="true">Oct 26<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/26/late-binding-and-upcast/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-
-<figure class='code'><figcaption><span>Music.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Instrument</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Instrument.play()&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">Wind</span> <span class="kd">extends</span> <span class="n">Instrument</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Wind.play()&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Music</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">tune</span><span class="o">(</span><span class="n">Instrument</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">i</span><span class="o">.</span><span class="na">draw</span><span class="o">();</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Wind</span> <span class="n">w</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Wind</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">tune</span><span class="o">(</span><span class="n">w</span><span class="o">);</span> <span class="c1">// upcasting</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span><span class="c1">//Output: Wind.play()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/10/26/late-binding-and-upcast/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -512,6 +596,10 @@ the bass class without change the third class&#8217;s method.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/10/22/a-trap-in-php-base-convert/">A trap in php base_convert</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/03/13/shell-tips-with-ctrl-plus/">Shell Tips with Ctrl+(?)</a>
@@ -547,10 +635,6 @@ the bass class without change the third class&#8217;s method.</p>
     
       <li class="post">
         <a href="/blog/2012/11/27/basic-snytax-of-inner-class/">Basic syntax of inner class</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/26/some-params-in-php-fpm-with-dynamic-pattern/">Some params in php-fpm with dynamic pattern</a>
       </li>
     
   </ul>

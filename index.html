@@ -9,7 +9,10 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="There are some handy operator with command line: [Ctrl-d] #This exits shell or closes input on programs waiting for STDIN.NOTE: there must be no such &hellip;">
+  <meta name="description" content="Today I find an interesting thing: a php function base_convert convert.php 1
+2
+$a = 0x80;
+var_dump(base_convert($a, 16, 2)); No surprises: string(9 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +67,85 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/22/a-trap-in-php-base-convert/">A Trap in Php Base_convert</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-22T01:37:00+08:00" pubdate data-updated="true">Oct 22<span>nd</span>, 2013</time>
+        
+         | <a href="/blog/2013/10/22/a-trap-in-php-base-convert/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today I find an interesting thing: a php function <a href="http://us1.php.net/manual/en/function.base-convert.php">base_convert</a></p>
+
+<figure class='code'><figcaption><span>convert.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>No surprises:</p>
+
+<pre><code>string(9) "100101000"
+</code></pre>
+
+<p>Let&#8217;s go on!</p>
+
+<figure class='code'><figcaption><span>convert.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
+</span><span class='line'><span class="x">$b = ~$a;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($b, 16, 2), $b);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>output:</p>
+
+<pre><code>string(9) "100101000"
+string(9) "100101001"
+int(-129)
+</code></pre>
+
+<p>Hmm,it seems strange that binary <em><strong>100101001</strong></em> not equas decimal <em><strong>-129</strong></em>, but the result: -129 is the right answer,what happened?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/10/22/a-trap-in-php-base-convert/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -430,74 +512,6 @@ and the 7337 is the port for postgresql.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/12/03/reinforcement-php-environment-via-php-dot-ini/">Reinforcement Php Environment via php.ini</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-12-03T10:59:00+08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/12/03/reinforcement-php-environment-via-php-dot-ini/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I&#8217;m reading &lt;White hat talk about security of Web> written by aullik5,found that some generic option can reinforcement php env via php.ini,now share it.</p>
-
-<p>1.register_globals.</p>
-
-<pre><code>register_globals = Off
-Prevent from variables override.
-</code></pre>
-
-<p>2.open_basedir</p>
-
-<pre><code>Limit the files that can be opened by PHP to the specified directory-tree, including the file itself.
-When you want to restrict access to only the specified directory, end with a slash. For example: open_basedir = /dir/incl/,if not it will set as prefix.
-</code></pre>
-
-<p>3.allow_url_fopen &amp; allow_url_include</p>
-
-<pre><code>allow_url_include = Off
-allow_url_fopen = Off
-</code></pre>
-
-<p>4.display_errors &amp; log_errors</p>
-
-<pre><code>display_errors = Off
-log_errors = On
-If u turn it on,will give enough information to the attacker.The best way just put them into logs.
-</code></pre>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/12/03/reinforcement-php-environment-via-php-dot-ini/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -511,6 +525,10 @@ If u turn it on,will give enough information to the attacker.The best way just p
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/10/22/a-trap-in-php-base-convert/">A trap in php base_convert</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/03/13/shell-tips-with-ctrl-plus/">Shell Tips with Ctrl+(?)</a>
@@ -546,10 +564,6 @@ If u turn it on,will give enough information to the attacker.The best way just p
     
       <li class="post">
         <a href="/blog/2012/11/27/basic-snytax-of-inner-class/">Basic syntax of inner class</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/26/some-params-in-php-fpm-with-dynamic-pattern/">Some params in php-fpm with dynamic pattern</a>
       </li>
     
   </ul>

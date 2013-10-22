@@ -4,7 +4,7 @@
   <title><![CDATA[FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2013-10-22T11:57:44+08:00</updated>
+  <updated>2013-10-22T11:58:50+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -12,6 +12,143 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A trap in php base_convert]]></title>
+    <link href="http://FightingMan.github.com/blog/2013/10/22/a-trap-in-php-base-convert/"/>
+    <updated>2013-10-22T01:37:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2013/10/22/a-trap-in-php-base-convert</id>
+    <content type="html"><![CDATA[<p>Today I find an interesting thing: a php function <a href="http://us1.php.net/manual/en/function.base-convert.php">base_convert</a></p>
+
+<figure class='code'><figcaption><span>convert.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>No surprises:</p>
+
+<pre><code>string(9) "100101000"
+</code></pre>
+
+<p>Let&#8217;s go on!</p>
+
+<figure class='code'><figcaption><span>convert.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
+</span><span class='line'><span class="x">$b = ~$a;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($b, 16, 2), $b);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>output:</p>
+
+<pre><code>string(9) "100101000"
+string(9) "100101001"
+int(-129)
+</code></pre>
+
+<p>Hmm,it seems strange that binary <em><strong>100101001</strong></em> not equas decimal <em><strong>-129</strong></em>, but the result: -129 is the right answer,what happened?</p>
+
+<!--more-->
+
+
+<p>Then I reading the source code of this function <a href="https://github.com/php/php-src/blob/master/ext/standard/math.c#L1065">base_convert</a> The Unscientific-real function is <a href="https://github.com/php/php-src/blob/master/ext/standard/math.c#L839">_php_math_basetozval</a></p>
+
+<figure class='code'><figcaption><span>math.c </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">Z_STRLEN_P</span><span class="p">(</span><span class="n">arg</span><span class="p">);</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">c</span> <span class="o">=</span> <span class="o">*</span><span class="n">s</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="cm">/* might not work for EBCDIC */</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;A&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;Z&#39;</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;A&#39;</span> <span class="o">-</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;a&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;z&#39;</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;a&#39;</span> <span class="o">-</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          <span class="k">continue</span><span class="p">;</span> <span class="c1">//Evil continue...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="n">base</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">continue</span><span class="p">;</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="k">switch</span> <span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="mi">0</span>: <span class="cm">/* Integer */</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="n">num</span> <span class="o">&lt;</span> <span class="n">cutoff</span> <span class="o">||</span> <span class="p">(</span><span class="n">num</span> <span class="o">==</span> <span class="n">cutoff</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="n">cutlim</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>              <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">*</span> <span class="n">base</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'>              <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>              <span class="n">fnum</span> <span class="o">=</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'>              <span class="n">mode</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="cm">/* fall-through */</span>
+</span><span class='line'>      <span class="k">case</span> <span class="mi">1</span>: <span class="cm">/* Float */</span>
+</span><span class='line'>          <span class="n">fnum</span> <span class="o">=</span> <span class="n">fnum</span> <span class="o">*</span> <span class="n">base</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>    
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Read here do not complain: God is Fair.
+Another PHP functions can help us solve this problem:printf or sprintf.</p>
+
+<p>if you realy want to see the binary of <em><em>-129</em></em>, please use these functions like this:</p>
+
+<figure class='code'><figcaption><span>convert.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
+</span><span class='line'><span class="x">$b = ~$a;</span>
+</span><span class='line'><span class="x">var_dump(base_convert($b, 16, 2), $b);</span>
+</span><span class='line'><span class="x">printf(&quot;%b&quot;, $b);</span>
+</span><span class='line'><span class="x">echo &quot;\n&quot;;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Please verify the conclusion by yourself :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Shell Tips with Ctrl+(?)]]></title>
@@ -1848,76 +1985,6 @@ called), which discovers a radius value of zero(base on the its type), due to St
 </code></pre>
 
 <p>I can think a benefit of this design: if we have app which use google searching interface and have been compilied,and now your leader told you that we must changed to yahoo searching interface, and we don&#8217;t need to change the code also without recompiled it,we just adjust the yahoo interface.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Late binding &amp; upcasting]]></title>
-    <link href="http://FightingMan.github.com/blog/2012/10/26/late-binding-and-upcast/"/>
-    <updated>2012-10-26T19:08:00+08:00</updated>
-    <id>http://FightingMan.github.com/blog/2012/10/26/late-binding-and-upcast</id>
-    <content type="html"><![CDATA[
-
-<figure class='code'><figcaption><span>Music.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Instrument</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Instrument.play()&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">Wind</span> <span class="kd">extends</span> <span class="n">Instrument</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Wind.play()&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Music</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">tune</span><span class="o">(</span><span class="n">Instrument</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">i</span><span class="o">.</span><span class="na">draw</span><span class="o">();</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Wind</span> <span class="n">w</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Wind</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">tune</span><span class="o">(</span><span class="n">w</span><span class="o">);</span> <span class="c1">// upcasting</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span><span class="c1">//Output: Wind.play()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!--more-->
-
-
-<p>As you can see the output,because of dynamic binding(also called late binding).</p>
-
-<p>Late bingding is needed when the compiler determines that thers more than one possible method that could be executed by a particular call.</p>
-
-<p>Late binding has definition a mechanism by which, when the compiler can&#8217;t determine which method implementation to use in advance at compile-time,the runtime system selects the appropriate method at runtime,base on the class of the object.</p>
-
-<p>Late binding has definition the process of binding a call to particular method this is performed dynamically at run-time due wo the presence of polymorphism.</p>
 ]]></content>
   </entry>
   
