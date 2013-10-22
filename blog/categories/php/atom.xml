@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: PHP | FightingMan's FootPrints]]></title>
+  <link href="http://FightingMan.github.com/blog/categories/php/atom.xml" rel="self"/>
+  <link href="http://FightingMan.github.com/"/>
+  <updated>2013-10-22T11:57:44+08:00</updated>
+  <id>http://FightingMan.github.com/</id>
+  <author>
+    <name><![CDATA[FightingMan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Reinforcement php environment via php.ini]]></title>
+    <link href="http://FightingMan.github.com/blog/2012/12/03/reinforcement-php-environment-via-php-dot-ini/"/>
+    <updated>2012-12-03T10:59:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2012/12/03/reinforcement-php-environment-via-php-dot-ini</id>
+    <content type="html"><![CDATA[<p>I'm reading &lt;White hat talk about security of Web> written by aullik5,found that some generic option can reinforcement php env via php.ini,now share it.</p>
+
+<p>1.register_globals.</p>
+
+<pre><code>register_globals = Off
+Prevent from variables override.
+</code></pre>
+
+<p>2.open_basedir</p>
+
+<pre><code>Limit the files that can be opened by PHP to the specified directory-tree, including the file itself.
+When you want to restrict access to only the specified directory, end with a slash. For example: open_basedir = /dir/incl/,if not it will set as prefix.
+</code></pre>
+
+<p>3.allow_url_fopen &amp; allow_url_include</p>
+
+<pre><code>allow_url_include = Off
+allow_url_fopen = Off
+</code></pre>
+
+<p>4.display_errors &amp; log_errors</p>
+
+<pre><code>display_errors = Off
+log_errors = On
+If u turn it on,will give enough information to the attacker.The best way just put them into logs.
+</code></pre>
+
+<!--more-->
+
+
+<p>5.magic_quotes_gpc <a href="http://stackoverflow.com/questions/2610524/why-turning-magic-quotes-gpc-on-in-php-is-considered-a-bad-practice">more</a></p>
+
+<pre><code>magic_quotes_gpc = Off
+Many methods can bypass it.
+</code></pre>
+
+<p>6.cgi.fix_pathinfo <a href="https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx-dont-trust-the-tutorials-check-your-configuration/">more</a></p>
+
+<pre><code>cgi.fix_pathinfo = 0 
+</code></pre>
+
+<p>7.session.cookie_httponly &amp; session.cookie_secure</p>
+
+<pre><code>session.cookie_httponly = true
+Prevent cross site script,javascript can't get the cookie's value.
+session.cookie_secure = true
+if u use https pass through the site.
+</code></pre>
+
+<p>8.safe_mode &amp; disable_functions</p>
+
+<pre><code>safe_mode = 0
+disable_functions = "apache_child_terminate, apache_setenv, define_syslog_variables, escapeshellarg, escapeshellcmd, eval, exec, dl, fsocket, pfsockopen, fsockopen, fp, fput, ftp_connect, ftp_exec, ftp_get, ftp_login, ftp_nb_fput, ftp_put, ftp_raw, ftp_rawlist, highlight_file, ini_alter, ini_get_all, ini_restore, inject_code, mysql_pconnect, openlog, phpinfo, passthru, php_uname, phpAds_remoteInfo, phpAds_XmlRpc, phpAds_xmlrpcDecode, phpAds_xmlrpcEncode, popen, posix_getpwuid, posix_kill, posix_mkfifo, posix_setpgid, posix_setsid, posix_setuid, posix_setuid, posix_uname, proc_close, proc_get_status, proc_nice, proc_open, proc_terminate, shell_exec, syslog, system, system,proc_open, symlink, xmlrpc_entity_decode, popen, curl_exec, curl_multi_exec, parse_ini_file, show_source" and etc.
+</code></pre>
+
+<p>At last we must always take care of user's input data and set correct right of web app dir.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some params in php-fpm with dynamic pattern]]></title>
+    <link href="http://FightingMan.github.com/blog/2012/11/26/some-params-in-php-fpm-with-dynamic-pattern/"/>
+    <updated>2012-11-26T20:45:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2012/11/26/some-params-in-php-fpm-with-dynamic-pattern</id>
+    <content type="html"><![CDATA[<p>When we set pm = dynamic in php-fpm.conf,there are some important params.</p>
+
+<pre><code>1. pm.max_children:This value sets the limit on the number of simultaneous requests that will be served.
+2. pm.start_servers: The number of child processes created on startup.
+3. pm.min_spare_servers: The desired minimum number of idle server processes.
+4. pm.max_spare_servers: The desired maximum number of idle server processes.
+5. pm.max_requests:The number of requests each child process should execute before respawning.
+</code></pre>
+
+<blockquote><p>The first and the second is easy to understand,how about the 3rd-5th?</p></blockquote>
+
+<p>The 3rd params which means: while forking full of subprocess arrive the 1st numbers,there also value of th 3rd sbprocess are idle.If pm.max_children was setted to 50,the highest number of concurrent request is limitted to (50 - the value of pm.min_spare_servers) in fact.</p>
+
+<!--more-->
+
+
+<p>The 4th params which means: With no request,the max subprocess is idle,after your concurrent arrived max_children,and the manager recovery of the subprocess till the values of pm.max_spare_servers.</p>
+
+<p>The 5th params which means: AS its explanation said,if its value was too small,the edge of it is 1(0 representatives request unlimited),all subprocesses may occur to restart at the same time,this is a tragedy.While its value was too big,the stack may be overflowed.This params is very usefull in 3rd party libraries.</p>
+
+<p>At last: the memory_limit in php.ini is very important,because it limitted the maximum memory that one php-fpm process  can be used.</p>
+
+<p>Also there are other very important params,here I'm not listed all of them,the above parameters just with strong correlation.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Codeigniter https defect]]></title>
+    <link href="http://FightingMan.github.com/blog/2012/11/21/codeigniter-https-defect/"/>
+    <updated>2012-11-21T17:05:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2012/11/21/codeigniter-https-defect</id>
+    <content type="html"><![CDATA[<p>Today I'm test a small experiment with CI and nginx,I found that:if I use its form helper submit the data ,http protocol will jump to https protocol,then I read the source code found that:</p>
+
+<pre><code><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Config.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">    ...</span>
+</span><span class='line'><span class="x">    if ($this-&amp;gt;config[&#39;base_url&#39;] == &#39;&#39;)</span>
+</span><span class='line'><span class="x">    {</span>
+</span><span class='line'><span class="x">        if (isset($_SERVER[&#39;HTTP_HOST&#39;]))</span>
+</span><span class='line'><span class="x">        {</span>
+</span><span class='line'><span class="x">            $base_url = isset($_SERVER[&#39;HTTPS&#39;]) &amp;amp;&amp;amp; strtolower($_SERVER[&#39;HTTPS&#39;]) !== &#39;off&#39; ? &#39;https&#39; : &#39;http&#39;;</span>
+</span><span class='line'><span class="x">            $base_url .= &#39;://&#39;. $_SERVER[&#39;HTTP_HOST&#39;];</span>
+</span><span class='line'><span class="x">            $base_url .= str_replace(basename($_SERVER[&#39;SCRIPT_NAME&#39;]), &#39;&#39;, $_SERVER[&#39;SCRIPT_NAME&#39;]);</span>
+</span><span class='line'><span class="x">        }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">        else</span>
+</span><span class='line'><span class="x">        {</span>
+</span><span class='line'><span class="x">            $base_url = &#39;http://localhost/&#39;;</span>
+</span><span class='line'><span class="x">        }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">        $this-&amp;gt;set_item(&#39;base_url&#39;, $base_url);</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'><span class="x">    ...</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
+
+<p>Which means if you forget to set the value of base_url in config.php, CI will set it automatic,and if you use nginx and install the ssl module,the $_SERVER['HTTPS'] has been setted,it will be an empty string if you don't use it.
+TO solve it, you must set value of base_url in config.php</p>
+
+<pre><code><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>config.php </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">    $_SERVER[&#39;HTTPS&#39;] = &#39;off&#39;;// if u don&#39;t use https,or set the base_url $config[&#39;base_url&#39;]   = &#39;http://yoursite&#39;;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

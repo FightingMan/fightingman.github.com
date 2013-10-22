@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Mongodb | FightingMan's FootPrints]]></title>
+  <link href="http://FightingMan.github.com/blog/categories/mongodb/atom.xml" rel="self"/>
+  <link href="http://FightingMan.github.com/"/>
+  <updated>2013-10-22T11:57:44+08:00</updated>
+  <id>http://FightingMan.github.com/</id>
+  <author>
+    <name><![CDATA[FightingMan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Example of sharding cluster]]></title>
+    <link href="http://FightingMan.github.com/blog/2012/12/01/example-of-sharding-cluster/"/>
+    <updated>2012-12-01T19:45:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2012/12/01/example-of-sharding-cluster</id>
+    <content type="html"><![CDATA[<p>Previous article showed some basic theories of Mongodb sharding,now we'll demonstrate it.
+Prepare 15 servers:172.16.103.200~172.16.103.214</p>
+
+<p><img src="/images/demo.jpeg"></p>
+
+<p>Suppose you had been installed mongodb in /usr/local/mongdb and its structure:</p>
+
+<pre><code>|-- GNU-AGPL-3.0
+|-- README
+|-- THIRD-PARTY-NOTICES
+|-- bin
+|   |-- bsondump
+|   |-- mongo
+|   |-- mongod
+|   |-- mongodump
+|   |-- mongoexport
+|   |-- mongofiles
+|   |-- mongoimport
+|   |-- mongorestore
+|   |-- mongos
+|   |-- mongosniff
+|   |-- mongostat
+|   `-- mongotop
+|-- db//Directory
+|-- mongodb.conf
+`-- mongodb.log
+</code></pre>
+
+<!--more-->
+
+
+<p>1.Configuration servers.//200-202</p>
+
+<pre><code>vi /usr/local/mongodb/mongodb.conf
+fork = true
+logpath = /usr/local/mongodb/mongodb.log
+dbpath = /usr/local/mongodb/db/
+logappend=true
+journal=true
+configsvr=true
+/usr/local/mongdb/bin/mongod --config /usr/local/mongodb/mongodb.conf #start it
+</code></pre>
+
+<p>2.Mongos.//203-205</p>
+
+<pre><code>vi /usr/local/mongodb/mongodb.conf
+fork = true
+logpath = /usr/local/mongodb/mongodb.log
+logappend=true
+configdb=172.16.103.200,172.16.103.201,172.16.103.202
+/usr/local/mongdb/bin/mongos --config /usr/local/mongodb/mongodb.conf #start it
+</code></pre>
+
+<p>3.Shards.//206-214</p>
+
+<pre><code>vi /usr/local/mongodb/mongodb.conf
+fork = true
+logpath = /usr/local/mongodb/mongodb.log
+dbpath = /usr/local/mongodb/db/
+logappend=true
+journal=true
+#206-208
+replSet=sd1
+#209-211
+replSet=sd2
+#212-214
+replSet=sd3
+/usr/local/mongdb/bin/mongod --config /usr/local/mongodb/mongodb.conf #start it
+</code></pre>
+
+<p>4.Replica Set.</p>
+
+<pre><code>#connect to one of sd1's svr//default primary svr
+&gt;/usr/local/mongodb/bin/mongo 127.0.0.1:27017/admin
+&gt;config = {_id:"sd1",members:[
+... {_id:0,host:'172.16.103.206:27017'},
+... {_id:1,host:'172.16.103.207:27017'},
+... {_id:2,host:'172.16.103.208:27017'}]
+... }
+&gt;rs.initiate(config);
+#connect to one of sd2's svr//default primary svr
+&gt;/usr/local/mongodb/bin/mongo 127.0.0.1:27017/admin
+&gt;config = {_id:"sd2",members:[
+... {_id:0,host:'172.16.103.209:27017'},
+... {_id:1,host:'172.16.103.210:27017'},
+... {_id:2,host:'172.16.103.211:27017'}]
+... }
+&gt;rs.initiate(config);
+#connect to one of sd2's svr//default primary svr
+&gt;/usr/local/mongodb/bin/mongo 127.0.0.1:27017/admin
+&gt;config = {_id:"sd3",members:[
+... {_id:0,host:'172.16.103.212:27017'},
+... {_id:1,host:'172.16.103.213:27017'},
+... {_id:2,host:'172.16.103.214:27017'}]
+... }
+&gt;rs.initiate(config);
+</code></pre>
+
+<p>5.Add shards.</p>
+
+<pre><code>#connect to one mongos svr
+/usr/local/mongodb/bin/mongo 127.0.0.1:27017/config
+#set chunksize,default 64M
+db.setting.save({_id:"chunksize",value:64})
+#add shards,you can set the maxsize by yourself//default 2048M
+use admin
+db.runCommand({addshard:"sd1/172.16.103.206:27017,172.16.103.207:27017,172.16.103.208:27017",maxsize:20480})
+db.runCommand({addshard:"sd2/172.16.103.209:27017,172.16.103.210:27017,172.16.103.211:27017",maxsize:20480})
+db.runCommand({addshard:"sd3/172.16.103.212:27017,172.16.103.213:27017,172.16.103.214:27017",maxsize:20480})
+#test comperation success
+db.runCommand({listshards:1})#will list all the shards if successed.
+#Active DB
+db.runCommand({enablesharding:"mydemo"});
+#set shard key for collection:user,before you do it , you can create some indexer for the key except unique indexer,if don't mongodb will create one for you automatically.
+db.runCommand({shardcollection:"mydemo.user",key:{id:1,name:1}})
+</code></pre>
+
+<p>Now every thing have been done,enjoy it :)//Other way,you can test this demo with three svrs just change their default port.</p>
+
+<p>Let's talk about the shard key,the most important thing in my mind. <a href="http://docs.mongodb.org/manual/core/sharding/#shard-keys">Docs</a></p>
+
+<p>Choose a good key make you get twice the result with half the effort.//from scaling mongodb.</p>
+
+<p>A general formula //twitter-like.</p>
+
+<pre><code>{coarseLocalityfield:1,searchfield:1}
+</code></pre>
+
+<p>Before we choose one,think about the answers to these questions:</p>
+
+<pre><code>What do writes looks like? What is the shape and size of the documents you'er inserting?
+How much data is the system writing per hour? Per day?And the peak?
+What fields are random, and which ones are increasing?
+what do reads look like? What data are people accessing?
+How much data is the system reading per hour? Per day?And the peak?
+Is the data indexed? Should it be indexed?
+How much data is there,total?
+</code></pre>
+
+<p>Before you shard, you should get to know your data very well.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Summary of Understanding Mongodb Sharding]]></title>
+    <link href="http://FightingMan.github.com/blog/2012/11/28/summary-of-understanding-mongodb-sharding/"/>
+    <updated>2012-11-28T22:16:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2012/11/28/summary-of-understanding-mongodb-sharding</id>
+    <content type="html"><![CDATA[<p>Sharding is the method Mongodb uses to split a large collection across several servers(called a cluster).</p>
+
+<p>A Mongodb cluster basically consists of three types of processes:the shards for actually storing data, the mongos processes for routing requests to the correct data,and the config servers,for keeping track of the cluster's state.</p>
+
+<p><img src="/images/MongodbCluster.jpeg"></p>
+
+<blockquote><ol>
+<li>The Config Servers:
+  Config servers hold the definitive information about the cluster for everyone's access (shards,mongos processes, and system administrtors).</li>
+<li>Mongos:
+  Mongos is the interaction point  between users and the cluster..Its job is to hide all of the gooey internals of sharding  and present a clean, single-server interface to the user.Mongos can help you to use targeted query if you query involves the shard key.</li>
+<li>Shards:
+  A shard is one or more servers in a cluster that are responsible for some subset of the data(more than one server used for replica set usually).</li>
+</ol>
+</blockquote>
+
+<!--more-->
+
+
+<p>Shard key And Chunk</p>
+
+<blockquote><p>The key you choose to use for chunk ranges is called a shard key(can be any field or combination of fields).e.g.
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Suppose our collection had documents that looked like this (_ids omitted):
+</span><span class='line'>{"username" : "paul", "age" : 23}
+</span><span class='line'>{"username" : "simon", "age" : 17}
+</span><span class='line'>{"username" : "widdly", "age" : 16}
+</span><span class='line'>{"username" : "scuds", "age" : 95}
+</span><span class='line'>{"username" : "grill", "age" : 18}
+</span><span class='line'>{"username" : "flavored", "age" : 55}
+</span><span class='line'>{"username" : "bertango", "age" : 73}
+</span><span class='line'>{"username" : "wooster", "age" : 33}
+</span><span class='line'>If we choose the age field as a shard key and end up with a chunk range [15, 26),
+</span><span class='line'>thechunk would contain the following documents:
+</span><span class='line'>{"username" : "paul", "age" : 23}
+</span><span class='line'>{"username" : "simon", "age" : 17}
+</span><span class='line'>{"username" : "widdly", "age" : 16}
+</span><span class='line'>{"username" : "grill", "age" : 18}</span></code></pre></td></tr></table></div></figure></notextile></div>
+When you first shard a collection , Mongodb creates a single chunk for whatever data is in the collection,and the has a range of (-∞,+∞),until you inserted more data,-∞ is the smallest value ,+∞ is the largest value.
+If you insert enough data into the shards,Mongodb would split the initial chunk into two chunks around the midpoint.So,if approximately half of the documents had a an age field less than 15 and halst were greater than 15(above demo),Mongodb might choose 15 as th midpoint.Then we had two chunks:(-∞,15),[15,+∞).If we continued to insert data into the [15,+∞)chunk,it could be split again,so we have three chunks:(-∞,15),[15,midpoint),[midpoint,+∞).As we insert more data,Mongodb will continued to split existing chunks to create new chunks.
+We also can hava a chunk with a single value,but every chunk's range must be distincti.you cannot have overlapping chunks,each chunk's range must exactly meet the next chunk's range.e.g.</p>
+
+<pre><code>if you split a chunk with the range[1,10),you can't have [1,5),[6,10);[1,5],[5,10);[1,5),[4,10).
+keep in mind: each document must belong to one and only one chunk.
+</code></pre>
+
+<p>Also you can use different type for the documents,but can't with empty values,Mongodb would sort it according to its type:</p>
+
+<pre><code>null&lt;numbers&lt;strings&lt;objects&lt;arrays&lt;binary data&lt;ObjectIds&lt;booleans&lt;dates&lt;regular expressions
+</code></pre></blockquote>
+
+<p>Balancer</p>
+
+<blockquote><p>If there are multiple shards available,Mongodb will start migrating data to other shards once you have a sufficient number of chunks.This migration is called balancing and is perfomed bt a process called the balancer.
+The balancer moves chunks from one shard to another automatically.
+The goal of the balancer is not only to keep the data evenly distributed but also to minimize the amount of data transferred.</p></blockquote>
+
+<p>Multi-range shards</p>
+
+<blockquote><p>Allowing multiple,non-consesutive ranges in a shard allow us to pick and choose data and move it.</p></blockquote>
+
+<p><img src="/images/move1.jpeg"></p>
+
+<blockquote><p>When a new shard is added,everyone can contribute data to it directly.</p></blockquote>
+
+<p><img src="/images/move2.jpeg"></p>
+
+<blockquote><p>For a balancing round to occur, a shard must have at leat nine more chunks than the least-populous shard,so chunks will be migrated off of the crowed shard until it is even with the rest of the shards,because Mongodb wants to avoid sending the same data back and forth.Also keep in mind nine chunks is not even that much of an imbalance-it is less than 2GB of data,as Mongodb want minimize pointless data transfers.</p></blockquote>
+
+<p><img src="/images/avoid.jpeg"></p>
+
+<p>Notice:In a real system, chunks are only 64MB by default,also you can change it in megabytes(db.settings.save( { _id:"chunksize", value: <size>}))</p>
+]]></content>
+  </entry>
+  
+</feed>
