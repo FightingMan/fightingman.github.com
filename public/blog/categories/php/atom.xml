@@ -4,7 +4,7 @@
   <title><![CDATA[Category: PHP | FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2013-10-22T12:13:14+08:00</updated>
+  <updated>2014-04-24T00:53:11+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -19,28 +19,22 @@
     <updated>2013-10-22T01:37:00+08:00</updated>
     <id>http://FightingMan.github.com/blog/2013/10/22/a-trap-in-php-base-convert</id>
     <content type="html"><![CDATA[<p>Today I find an interesting thing: a php function <a href="http://us1.php.net/manual/en/function.base-convert.php">base_convert</a>
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>convert.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+{% codeblock convert.php %}
+$a = 0x80;
+var_dump(base_convert($a, 16, 2));
+{% endcodeblock %}
 No surprises:</p>
 
 <pre><code>string(9) "100101000"
 </code></pre>
 
 <p>Let's go on!
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>convert.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
-</span><span class='line'><span class="x">$b = ~$a;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($b, 16, 2), $b);</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+{% codeblock convert.php %}
+$a = 0x80;
+var_dump(base_convert($a, 16, 2));
+$b = ~$a;
+var_dump(base_convert($b, 16, 2), $b);
+{% endcodeblock %}
 output:</p>
 
 <pre><code>string(9) "100101000"
@@ -55,98 +49,55 @@ int(-129)
 
 <p>Then I reading the source code of this function <a href="https://github.com/php/php-src/blob/master/ext/standard/math.c#L1065">base_convert</a> The Unscientific-real function is <a href="https://github.com/php/php-src/blob/master/ext/standard/math.c#L839">_php_math_basetozval</a></p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>math.c </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">Z_STRLEN_P</span><span class="p">(</span><span class="n">arg</span><span class="p">);</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">c</span> <span class="o">=</span> <span class="o">*</span><span class="n">s</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/* might not work for EBCDIC */</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">c</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;A&#39;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">c</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;Z&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;A&#39;</span> <span class="o">-</span> <span class="mi">10</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;a&#39;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">c</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;z&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">c</span> <span class="o">-=</span> <span class="sc">&#39;a&#39;</span> <span class="o">-</span> <span class="mi">10</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>        <span class="k">continue</span><span class="p">;</span> <span class="c1">//Evil continue...</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="n">base</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">continue</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">case</span> <span class="mi">0</span>: <span class="cm">/* Integer */</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">num</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">cutoff</span> <span class="o">||</span> <span class="p">(</span><span class="n">num</span> <span class="o">==</span> <span class="n">cutoff</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">c</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="n">cutlim</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">*</span> <span class="n">base</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">fnum</span> <span class="o">=</span> <span class="n">num</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">mode</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="cm">/* fall-through */</span>
-</span><span class='line'>    <span class="k">case</span> <span class="mi">1</span>: <span class="cm">/* Float */</span>
-</span><span class='line'>        <span class="n">fnum</span> <span class="o">=</span> <span class="n">fnum</span> <span class="o">*</span> <span class="n">base</span> <span class="o">+</span> <span class="n">c</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p>{% codeblock math.c %}</p>
+
+<pre><code>for (i = Z_STRLEN_P(arg); i &gt; 0; i--) {
+    c = *s++;
+
+    /* might not work for EBCDIC */
+    if (c &gt;= '0' &amp;&amp; c &lt;= '9') 
+        c -= '0';
+    else if (c &gt;= 'A' &amp;&amp; c &lt;= 'Z') 
+        c -= 'A' - 10;
+    else if (c &gt;= 'a' &amp;&amp; c &lt;= 'z') 
+        c -= 'a' - 10;
+    else
+        continue; //Evil continue...
+
+    if (c &gt;= base)
+        continue;
+
+    switch (mode) {
+    case 0: /* Integer */
+        if (num &lt; cutoff || (num == cutoff &amp;&amp; c &lt;= cutlim)) {
+            num = num * base + c;
+            break;
+        } else {
+            fnum = num;
+            mode = 1;
+        }
+        /* fall-through */
+    case 1: /* Float */
+        fnum = fnum * base + c;
+    }   
+}
+</code></pre>
+
+<p>{% endcodeblock %}</p>
 
 <p>Read here do not complain: God is Fair.
 Another PHP functions can help us solve this problem:printf or sprintf.</p>
 
 <p>if you realy want to see the binary of <em><em>-129</em></em>, please use these functions like this:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>convert.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
-</span><span class='line'><span class="x">$b = ~$a;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($b, 16, 2), $b);</span>
-</span><span class='line'><span class="x">printf(&quot;%b&quot;, $b);</span>
-</span><span class='line'><span class="x">echo &quot;\n&quot;;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>{% codeblock convert.php %}
+$a = 0x80;
+var_dump(base_convert($a, 16, 2));
+$b = ~$a;
+var_dump(base_convert($b, 16, 2), $b);
+printf("%b", $b);
+echo "\n";
+{% endcodeblock %}
 Please verify the conclusion by yourself :)</p>
 ]]></content>
   </entry>
@@ -253,53 +204,34 @@ disable_functions = "apache_child_terminate, apache_setenv, define_syslog_variab
     <id>http://FightingMan.github.com/blog/2012/11/21/codeigniter-https-defect</id>
     <content type="html"><![CDATA[<p>Today I'm test a small experiment with CI and nginx,I found that:if I use its form helper submit the data ,http protocol will jump to https protocol,then I read the source code found that:</p>
 
-<pre><code><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Config.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">    ...</span>
-</span><span class='line'><span class="x">    if ($this-&amp;gt;config[&#39;base_url&#39;] == &#39;&#39;)</span>
-</span><span class='line'><span class="x">    {</span>
-</span><span class='line'><span class="x">        if (isset($_SERVER[&#39;HTTP_HOST&#39;]))</span>
-</span><span class='line'><span class="x">        {</span>
-</span><span class='line'><span class="x">            $base_url = isset($_SERVER[&#39;HTTPS&#39;]) &amp;amp;&amp;amp; strtolower($_SERVER[&#39;HTTPS&#39;]) !== &#39;off&#39; ? &#39;https&#39; : &#39;http&#39;;</span>
-</span><span class='line'><span class="x">            $base_url .= &#39;://&#39;. $_SERVER[&#39;HTTP_HOST&#39;];</span>
-</span><span class='line'><span class="x">            $base_url .= str_replace(basename($_SERVER[&#39;SCRIPT_NAME&#39;]), &#39;&#39;, $_SERVER[&#39;SCRIPT_NAME&#39;]);</span>
-</span><span class='line'><span class="x">        }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">        else</span>
-</span><span class='line'><span class="x">        {</span>
-</span><span class='line'><span class="x">            $base_url = &#39;http://localhost/&#39;;</span>
-</span><span class='line'><span class="x">        }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">        $this-&amp;gt;set_item(&#39;base_url&#39;, $base_url);</span>
-</span><span class='line'><span class="x">    }</span>
-</span><span class='line'><span class="x">    ...</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<pre><code>{% codeblock Config.php %}
+    ...
+    if ($this-&gt;config['base_url'] == '')
+    {
+        if (isset($_SERVER['HTTP_HOST']))
+        {
+            $base_url = isset($_SERVER['HTTPS']) &amp;&amp; strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
+            $base_url .= '://'. $_SERVER['HTTP_HOST'];
+            $base_url .= str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+        }
+
+        else
+        {
+            $base_url = 'http://localhost/';
+        }
+
+        $this-&gt;set_item('base_url', $base_url);
+    }
+    ...
+{% endcodeblock %}
 </code></pre>
 
 <p>Which means if you forget to set the value of base_url in config.php, CI will set it automatic,and if you use nginx and install the ssl module,the $_SERVER['HTTPS'] has been setted,it will be an empty string if you don't use it.
 TO solve it, you must set value of base_url in config.php</p>
 
-<pre><code><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>config.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">    $_SERVER[&#39;HTTPS&#39;] = &#39;off&#39;;// if u don&#39;t use https,or set the base_url $config[&#39;base_url&#39;]   = &#39;http://yoursite&#39;;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<pre><code>{% codeblock config.php %}
+    $_SERVER['HTTPS'] = 'off';// if u don't use https,or set the base_url $config['base_url']   = 'http://yoursite';
+{% endcodeblock %}
 </code></pre>
 ]]></content>
   </entry>

@@ -4,7 +4,7 @@
   <title><![CDATA[FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2013-10-22T12:13:14+08:00</updated>
+  <updated>2014-04-24T00:53:09+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[short notes]]></title>
+    <link href="http://FightingMan.github.com/blog/2014/04/24/short-notes/"/>
+    <updated>2014-04-24T00:11:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2014/04/24/short-notes</id>
+    <content type="html"><![CDATA[<p>好记性不如烂笔头，很久没写博客了，重新开始吧。
+我这种半路出家的酱油程序员，最近看算法学习了很多东西,很多东西有耳目一醒的感觉。
+今天看到一道题，对位的操作算是，第一次比较熟悉的用了下：</p>
+
+<pre><code>如何判断n的第i位是否为1：n &amp; (1 &lt;&lt; i).
+</code></pre>
+
+<p>顺便想了下之前对位操作的总结：</p>
+
+<pre><code>按位与通常用来将变量中的某些位清0同时保留某些位不变: n &amp;= 0xffffff00,低八位全为0.
+按位或通常用来将变量中得某些位设置为1同时保留某些位不变：n |= 0xff,低八位全为1.
+按位异或有个特点：a ^ b === c =&gt; c ^ b == a &amp; c ^ a == b.可以快速简单的加解密.
+左移n位就等于乘以2的n次方.
+右移n位就等于除以2的n次方，并且将结果往小里取.
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A trap in php base_convert]]></title>
@@ -1759,232 +1782,6 @@ TO solve it, you must set value of base_url in config.php</p>
 
 
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Polymorphism one]]></title>
-    <link href="http://FightingMan.github.com/blog/2012/10/31/polymorphism-one/"/>
-    <updated>2012-10-31T21:19:00+08:00</updated>
-    <id>http://FightingMan.github.com/blog/2012/10/31/polymorphism-one</id>
-    <content type="html"><![CDATA[<p>Polymorphism always perform the right behavior because of late-binding,as the last posts say.</p>
-
-<p>Polymorphism also havs better extensibility,if a class inherited the base class,and another class has a method(the param&#8217;s type is base class),now you can add any more derived class from
-the bass class without change the third class&#8217;s method.</p>
-
-<p>Pitfall:</p>
-
-<p>a. If the derived class override the private method which in the base class,and call the method with upcasting to the base class ,unexpected the method will be called in the base class.</p>
-
-<figure class='code'><figcaption><span>pitfallOne.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">pitfallOne</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">private</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;sup&quot;</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">pitfallOne</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
-</span><span class='line'>                <span class="n">p</span><span class="o">.</span><span class="na">f</span><span class="o">();</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">pitfallOne</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;sub&quot;</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span><span class="c1">//output:sup;</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p> b. If you access a field directly, the access will be resolved at compile-time,won&#8217;t happen polymorphically.</p>
-
-<!--more-->
-
-
-
-
-<figure class='code'><figcaption><span>pitfallTwo.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">class</span> <span class="nc">sup</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kt">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">24</span><span class="o">;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">sup</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kt">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">12</span><span class="o">;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">pitfallTwo</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">sup</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">age</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span><span class="c1">//output:24;</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p> c. If a method is static, it doesn&#8217;t behave polymorphically,because static methods associated with the class, and not the individual objects.</p>
-
-<figure class='code'><figcaption><span>pitfallThree.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">class</span> <span class="nc">sup</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">static</span> <span class="kt">void</span> <span class="nf">staticGet</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;super static method&quot;</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">sup</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">static</span> <span class="kt">void</span> <span class="nf">staticGet</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;sub static method&quot;</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">pitfallThree</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">sup</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
-</span><span class='line'>                <span class="n">s</span><span class="o">.</span><span class="na">staticGet</span><span class="o">();</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span><span class="c1">//output: super static method.</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p> As we know that a constructor for the base class is always called during the construction process for a derived class,chaining up the inhreitance hierarchy. And if we
-do have cleanup issues,the order of cleanup should be the reverse of the order of initialization,in case one subobjects depends on another.</p>
-
-<p>If you call a dynamically-bound method inside a constructor,the effect of this call can be rather unexpected because the overridden method will be called before the object is fully
-constructed.</p>
-
-<figure class='code'><figcaption><span>PolyConstructors.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Glyph</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">draw</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">print</span><span class="o">(</span><span class="s">&quot;Glyph.draw()&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">Glyph</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">print</span><span class="o">(</span><span class="s">&quot;Glyph() before draw()&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">draw</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">print</span><span class="o">(</span><span class="s">&quot;Glyph() after draw()&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">RoundGlyph</span> <span class="kd">extends</span> <span class="n">Glyph</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="kt">int</span> <span class="n">radius</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
-</span><span class='line'>    <span class="n">RoundGlyph</span><span class="o">(</span><span class="kt">int</span> <span class="n">r</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">radius</span> <span class="o">=</span> <span class="n">r</span><span class="o">;</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;RoundGlyph.RoundGlyph(), radius = &quot;</span> <span class="o">+</span> <span class="n">radius</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">draw</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;RoundGlyph.draw(), radius = &quot;</span> <span class="o">+</span> <span class="n">radius</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PolyConstructors</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">new</span> <span class="nf">RoundGlyph</span><span class="o">(</span><span class="mi">5</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span><span class="c1">//output:</span>
-</span><span class='line'><span class="n">Glyph</span><span class="o">()</span> <span class="n">before</span> <span class="n">draw</span><span class="o">()</span>
-</span><span class='line'><span class="n">RoundGlyph</span><span class="o">.</span><span class="na">draw</span><span class="o">(),</span> <span class="n">radius</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'><span class="n">Glyph</span><span class="o">()</span> <span class="n">after</span> <span class="n">draw</span><span class="o">()</span>
-</span><span class='line'><span class="n">RoundGlyph</span><span class="o">.</span><span class="na">RoundGlyph</span><span class="o">(),</span> <span class="n">radius</span> <span class="o">=</span> <span class="mi">5</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>At first we must know the actual process initialization:</p>
-
-<pre><code>1 The storage allocated for the object is initialized to binary zero before anything else
-happens.
-2 The base-class constructors are called as described previously. At this point, the
-overridden draw( ) method is called (yes, before the RoundGlyph constructor is
-called), which discovers a radius value of zero(base on the its type), due to Step 1.
-3 Member initializers are called in the order of declaration.
-4 The body of the derived-class constructor is called.
-</code></pre>
-
-<p>I can think a benefit of this design: if we have app which use google searching interface and have been compilied,and now your leader told you that we must changed to yahoo searching interface, and we don&#8217;t need to change the code also without recompiled it,we just adjust the yahoo interface.</p>
 ]]></content>
   </entry>
   

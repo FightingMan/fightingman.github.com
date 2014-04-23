@@ -9,29 +9,7 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Music.java 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-class Instrument { public void play() { System.out.println(&quot;Instrument.play &hellip;">
+  <meta name="description" content="Polymorphism always perform the right behavior because of late-binding,as the last posts say. Polymorphism also havs better extensibility,if a class &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +64,94 @@ class Instrument { public void play() { System.out.println(&quot;Instrument.play
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/31/polymorphism-one/">Polymorphism One</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-31T21:19:00+08:00" pubdate data-updated="true">Oct 31<span>st</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/31/polymorphism-one/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Polymorphism always perform the right behavior because of late-binding,as the last posts say.</p>
+
+<p>Polymorphism also havs better extensibility,if a class inherited the base class,and another class has a method(the param&#8217;s type is base class),now you can add any more derived class from
+the bass class without change the third class&#8217;s method.</p>
+
+<p>Pitfall:</p>
+
+<p>a. If the derived class override the private method which in the base class,and call the method with upcasting to the base class ,unexpected the method will be called in the base class.</p>
+
+<figure class='code'><figcaption><span>pitfallOne.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">pitfallOne</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kd">private</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;sup&quot;</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">pitfallOne</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
+</span><span class='line'>                <span class="n">p</span><span class="o">.</span><span class="na">f</span><span class="o">();</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">pitfallOne</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;sub&quot;</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span><span class="c1">//output:sup;</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> b. If you access a field directly, the access will be resolved at compile-time,won&#8217;t happen polymorphically.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/31/polymorphism-one/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -386,6 +452,10 @@ Satellites
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/04/24/short-notes/">short notes</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/22/a-trap-in-php-base-convert/">A trap in php base_convert</a>
       </li>
     
@@ -419,10 +489,6 @@ Satellites
     
       <li class="post">
         <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/27/basic-snytax-of-inner-class/">Basic syntax of inner class</a>
       </li>
     
   </ul>
@@ -461,6 +527,7 @@ Satellites
 <section>
 <h1>Category List</h1>
 <ul>
+  <li><a href='/blog/categories/c-c-'>C/c++</a></li>
   <li><a href='/blog/categories/java'>Java</a></li>
   <li><a href='/blog/categories/life'>Life</a></li>
   <li><a href='/blog/categories/mongodb'>Mongodb</a></li>
@@ -477,7 +544,7 @@ Satellites
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - FightingMan -
+  Copyright &copy; 2014 - FightingMan -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
