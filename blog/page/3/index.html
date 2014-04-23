@@ -9,7 +9,26 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="When we set pm = dynamic in php-fpm.conf,there are some important params. 1. pm.max_children:This value sets the limit on the number of simultaneous &hellip;">
+  <meta name="description" content="Place a class definition within another class definition that is called an inner class. Outer.java 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +83,111 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/27/basic-snytax-of-inner-class/">Basic Syntax of Inner Class</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-27T23:02:00+08:00" pubdate data-updated="true">Nov 27<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/27/basic-snytax-of-inner-class/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Place a class definition within another class definition that is called an inner class.</p>
+
+<figure class='code'><figcaption><span>Outer.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Outer</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;outer&#39;s f()&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">Inner</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="n">Outer</span> <span class="nf">outer</span><span class="o">()</span> <span class="o">{</span> <span class="c1">//!cannot with static</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">Outer</span><span class="o">.</span><span class="na">this</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="n">Outer</span> <span class="nf">outer</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//!cannot with static</span>
+</span><span class='line'>            <span class="k">return</span> <span class="k">new</span> <span class="nf">Outer</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;inner&#39;s f()&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="nf">Inner</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Inner</span> <span class="nf">inner</span><span class="o">()</span> <span class="o">{</span> <span class="c1">//!cannot with static</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nf">Inner</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/11/27/basic-snytax-of-inner-class/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -322,99 +446,6 @@ Since the fields are static,they are initialized when the class is first loaded,
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/21/codeigniter-https-defect/">Codeigniter Https Defect</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-21T17:05:00+08:00" pubdate data-updated="true">Nov 21<span>st</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/21/codeigniter-https-defect/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today I&#8217;m test a small experiment with CI and nginx,I found that:if I use its form helper submit the data ,http protocol will jump to https protocol,then I read the source code found that:</p>
-
-<figure class='code'><figcaption><span>Config.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">        ...</span>
-</span><span class='line'><span class="x">      if ($this-&gt;config[&#39;base_url&#39;] == &#39;&#39;)</span>
-</span><span class='line'><span class="x">      {</span>
-</span><span class='line'><span class="x">          if (isset($_SERVER[&#39;HTTP_HOST&#39;]))</span>
-</span><span class='line'><span class="x">          {</span>
-</span><span class='line'><span class="x">              $base_url = isset($_SERVER[&#39;HTTPS&#39;]) &amp;&amp; strtolower($_SERVER[&#39;HTTPS&#39;]) !== &#39;off&#39; ? &#39;https&#39; : &#39;http&#39;;</span>
-</span><span class='line'><span class="x">              $base_url .= &#39;://&#39;. $_SERVER[&#39;HTTP_HOST&#39;];</span>
-</span><span class='line'><span class="x">              $base_url .= str_replace(basename($_SERVER[&#39;SCRIPT_NAME&#39;]), &#39;&#39;, $_SERVER[&#39;SCRIPT_NAME&#39;]);</span>
-</span><span class='line'><span class="x">          }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">          else</span>
-</span><span class='line'><span class="x">          {</span>
-</span><span class='line'><span class="x">              $base_url = &#39;http://localhost/&#39;;</span>
-</span><span class='line'><span class="x">          }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">          $this-&gt;set_item(&#39;base_url&#39;, $base_url);</span>
-</span><span class='line'><span class="x">      }</span>
-</span><span class='line'><span class="x">        ...</span>
-</span><span class='line'><span class="x">    </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Which means if you forget to set the value of base_url in config.php, CI will set it automatic,and if you use nginx and install the ssl module,the $_SERVER[&#8216;HTTPS&#8217;] has been setted,it will be an empty string if you don&#8217;t use it.
-TO solve it, you must set value of base_url in config.php</p>
-
-<figure class='code'><figcaption><span>config.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">        $_SERVER[&#39;HTTPS&#39;] = &#39;off&#39;;// if u don&#39;t use https,or set the base_url $config[&#39;base_url&#39;]   = &#39;http://yoursite&#39;;</span>
-</span><span class='line'><span class="x">    </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -430,6 +461,10 @@ TO solve it, you must set value of base_url in config.php</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/04/24/short-notes/">short notes</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/10/22/a-trap-in-php-base-convert/">A trap in php base_convert</a>
@@ -465,10 +500,6 @@ TO solve it, you must set value of base_url in config.php</p>
     
       <li class="post">
         <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/27/basic-snytax-of-inner-class/">Basic syntax of inner class</a>
       </li>
     
   </ul>
@@ -507,6 +538,7 @@ TO solve it, you must set value of base_url in config.php</p>
 <section>
 <h1>Category List</h1>
 <ul>
+  <li><a href='/blog/categories/c-c-'>C/c++</a></li>
   <li><a href='/blog/categories/java'>Java</a></li>
   <li><a href='/blog/categories/life'>Life</a></li>
   <li><a href='/blog/categories/mongodb'>Mongodb</a></li>
@@ -523,7 +555,7 @@ TO solve it, you must set value of base_url in config.php</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - FightingMan -
+  Copyright &copy; 2014 - FightingMan -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
