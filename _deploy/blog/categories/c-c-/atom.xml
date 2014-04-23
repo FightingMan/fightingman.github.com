@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: C/C++ | FightingMan's FootPrints]]></title>
+  <link href="http://FightingMan.github.com/blog/categories/c-c-/atom.xml" rel="self"/>
+  <link href="http://FightingMan.github.com/"/>
+  <updated>2014-04-24T01:07:09+08:00</updated>
+  <id>http://FightingMan.github.com/</id>
+  <author>
+    <name><![CDATA[FightingMan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[short notes]]></title>
+    <link href="http://FightingMan.github.com/blog/2014/04/24/short-notes/"/>
+    <updated>2014-04-24T00:11:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2014/04/24/short-notes</id>
+    <content type="html"><![CDATA[<p>好记性不如烂笔头，很久没写博客了，重新开始吧。
+我这种半路出家的酱油程序员，最近看算法学习了很多东西,很多东西有耳目一醒的感觉。
+今天看到一道题，对位的操作算是，第一次比较熟悉的用了下：</p>
+
+<pre><code>如何判断n的第i位是否为1：n &amp; (1 &lt;&lt; i).
+</code></pre>
+
+<p>顺便想了下之前对位操作的总结：</p>
+
+<pre><code>按位与通常用来将变量中的某些位清0同时保留某些位不变: n &amp;= 0xffffff00,低八位全为0.
+按位或通常用来将变量中得某些位设置为1同时保留某些位不变：n |= 0xff,低八位全为1.
+按位异或有个特点：a ^ b === c =&gt; c ^ b == a &amp; c ^ a == b.可以快速简单的加解密.
+左移n位就等于乘以2的n次方.
+右移n位就等于除以2的n次方，并且将结果往小里取.
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
