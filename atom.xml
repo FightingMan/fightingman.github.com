@@ -4,7 +4,7 @@
   <title><![CDATA[FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2014-05-13T04:30:43+08:00</updated>
+  <updated>2014-05-13T05:00:56+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[socket编程字节排序的诡异问题]]></title>
+    <title type="html"><![CDATA[socket编程遇到字节排序的诡异问题]]></title>
     <link href="http://FightingMan.github.com/blog/2014/05/13/doubt-of-host-byte-order/"/>
     <updated>2014-05-13T03:00:00+08:00</updated>
     <id>http://FightingMan.github.com/blog/2014/05/13/doubt-of-host-byte-order</id>
@@ -173,9 +173,33 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>最后在inet.h的宏定义中看到
-Liquid error: ClassNotFound: no lexer for alias &#8216;h&#8217; found
-默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
+<p>最后在inet.h的宏定义中看到</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#ifndef INADDR_ANY
+</span><span class='line'>    # define INADDR_ANY ((unsigned long int) 0x00000000)
+</span><span class='line'>    #endif /* INADDR_ANY */
+</span><span class='line'>
+</span><span class='line'>    #ifndef INADDR_LOOPBACK
+</span><span class='line'>    # define INADDR_LOOPBACK    ((unsigned long int) 0x7f000001)
+</span><span class='line'>    #endif /* INADDR_LOOPBACK */
+</span><span class='line'>
+</span><span class='line'>    #ifndef INADDR_NONE
+</span><span class='line'>    # define INADDR_NONE    0xffffffff
+</span><span class='line'>    #endif /* INADDR_NONE */</span></code></pre></td></tr></table></div></figure>
+
+
+<p>默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
 但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。
 下面给段demo程序：</p>
 
