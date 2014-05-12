@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "socket编程字节排序的诡异问题"
+title: "socket编程遇到字节排序的诡异问题"
 date: 2014-05-13 03:00
 comments: true
 categories: Tcp/Ip C/C++
@@ -84,7 +84,7 @@ categories: Tcp/Ip C/C++
     }
 {% endcodeblock %}
 最后在inet.h的宏定义中看到
-{% codeblock inet.h %}
+{% codeblock %}
     #ifndef INADDR_ANY
     # define INADDR_ANY ((unsigned long int) 0x00000000)
     #endif /* INADDR_ANY */
