@@ -9,7 +9,7 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Polymorphism always perform the right behavior because of late-binding,as the last posts say. Polymorphism also havs better extensibility,if a class &hellip;">
+  <meta name="description" content="Covariant return types An overridden method in a derived class can return a type derived from the type returned by the base class method. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,131 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/04/polymorphism-two/">Polymorphism Two</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-04T21:08:00+08:00" pubdate data-updated="true">Nov 4<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/04/polymorphism-two/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Covariant return types</p>
+
+<blockquote><p>An overridden method in a derived class can return a type derived from the type returned by the base class method.</p></blockquote>
+
+<figure class='code'><figcaption><span>CovariantReturn.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">class</span> <span class="nc">Grain</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="s">&quot;Grain&quot;</span><span class="o">;</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">class</span> <span class="nc">Wheat</span> <span class="kd">extends</span> <span class="nf">Grain</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="s">&quot;Wheat&quot;</span><span class="o">;</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">class</span> <span class="nc">Mill</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">Grain</span> <span class="nf">process</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="k">new</span> <span class="nf">Grain</span><span class="o">();</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">class</span> <span class="nc">WheatMill</span> <span class="kd">extends</span> <span class="n">Mill</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">Wheat</span> <span class="nf">process</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="k">new</span> <span class="nf">Wheat</span><span class="o">();</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">CovariantReturn</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">Mill</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Mill</span><span class="o">();</span>
+</span><span class='line'>                <span class="n">Grain</span> <span class="n">g</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">process</span><span class="o">();</span>
+</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WheatMill</span><span class="o">();</span>
+</span><span class='line'>                <span class="n">g</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">process</span><span class="o">;</span>
+</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span><span class="c1">//output:</span>
+</span><span class='line'>        <span class="n">Grain</span>
+</span><span class='line'>        <span class="n">Wheat</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/11/04/polymorphism-two/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -337,107 +462,9 @@ the bass class without change the third class&#8217;s method.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/22/satellites/">Satellites</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-22T22:04:00+08:00" pubdate data-updated="true">Oct 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/22/satellites/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><pre><code>Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-Well, they said it was time for changing
-Rise and shine
-Everybody's making it, but you
-And they told you to trust your dreaming
-But it's hard to believe a feeling
-That you just don't know
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-You've been trying to walk on water
-In the end everybody
-Walked all over you
-
-Now, you don't like the sight of mirrors
-Cause you're scared that the face
-You'll see, will look just like before
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-All I want is you
-Let me take you back
-Where you once belonged
-All I want is you
-It will be alright if you come along
-You were never gone
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-
-Even an angel can end up falling
-Don't you cry, because you're crawling
-Start again, it's a beautiful morning
-For satellites
-Satellites
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/6/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -450,6 +477,10 @@ Satellites
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程字节排序的诡异问题</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/04/24/short-notes/">short notes</a>
@@ -485,10 +516,6 @@ Satellites
     
       <li class="post">
         <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a>
       </li>
     
   </ul>
@@ -534,6 +561,7 @@ Satellites
   <li><a href='/blog/categories/php'>Php</a></li>
   <li><a href='/blog/categories/security'>Security</a></li>
   <li><a href='/blog/categories/shell'>Shell</a></li>
+  <li><a href='/blog/categories/tcp-ip'>Tcp/ip</a></li>
 </ul>
 </section>
 

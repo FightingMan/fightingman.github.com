@@ -9,26 +9,7 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Place a class definition within another class definition that is called an inner class. Outer.java 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20 &hellip;">
+  <meta name="description" content="Sharding is the method Mongodb uses to split a large collection across several servers(called a cluster). A Mongodb cluster basically consists of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +64,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-28T22:16:00+08:00" pubdate data-updated="true">Nov 28<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Sharding is the method Mongodb uses to split a large collection across several servers(called a cluster).</p>
+
+<p>A Mongodb cluster basically consists of three types of processes:the shards for actually storing data, the mongos processes for routing requests to the correct data,and the config servers,for keeping track of the cluster&#8217;s state.</p>
+
+<p><img src="/images/MongodbCluster.jpeg"></p>
+
+<blockquote><ol>
+<li>The Config Servers:
+  Config servers hold the definitive information about the cluster for everyone&#8217;s access (shards,mongos processes, and system administrtors).</li>
+<li>Mongos:
+  Mongos is the interaction point  between users and the cluster..Its job is to hide all of the gooey internals of sharding  and present a clean, single-server interface to the user.Mongos can help you to use targeted query if you query involves the shard key.</li>
+<li>Shards:
+  A shard is one or more servers in a cluster that are responsible for some subset of the data(more than one server used for replica set usually).</li>
+</ol>
+</blockquote>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -337,115 +375,6 @@ Since the fields are static,they are initialized when the class is first loaded,
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/23/strategy-and-factory-design-patter-with-interface/">Strategy & Factory Design Pattern With Interface</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-23T00:39:00+08:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/23/strategy-and-factory-design-patter-with-interface/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Strategy design pattern</p>
-
-<blockquote><p>When you write a method that performs certain operations,and that method takes an interface which you also specify,then the others can use this method with any object,as long as their object conforms to the interface.</p></blockquote>
-
-<figure class='code'><figcaption><span>RandomWords.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">java.nio.*</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RandomWords</span> <span class="kd">implements</span> <span class="n">Readable</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Random</span> <span class="n">rand</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">(</span><span class="mi">47</span><span class="o">);</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">char</span><span class="o">[]</span> <span class="n">capitals</span> <span class="o">=</span> <span class="s">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">();</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">char</span><span class="o">[]</span> <span class="n">lowers</span> <span class="o">=</span> <span class="s">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">();</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">char</span><span class="o">[]</span> <span class="n">vowels</span> <span class="o">=</span> <span class="s">&quot;aeiou&quot;</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">();</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="kt">int</span> <span class="n">count</span><span class="o">;</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="nf">RandomWords</span><span class="o">(</span><span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">read</span><span class="o">(</span><span class="n">CharBuffer</span> <span class="n">cb</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">if</span><span class="o">(</span><span class="n">count</span><span class="o">--</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
-</span><span class='line'>        <span class="n">cb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">capitals</span><span class="o">[</span><span class="n">rand</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">capitals</span><span class="o">.</span><span class="na">length</span><span class="o">)]);</span>
-</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">cb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">lowers</span><span class="o">[</span><span class="n">rand</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">lowers</span><span class="o">.</span><span class="na">length</span><span class="o">)]);</span>
-</span><span class='line'>            <span class="n">cb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">vowels</span><span class="o">[</span><span class="n">rand</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">vowels</span><span class="o">.</span><span class="na">length</span><span class="o">)]);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">cb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;|&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">cb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Scanner</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scanner</span><span class="o">(</span><span class="k">new</span> <span class="n">RandomWords</span><span class="o">(</span><span class="mi">10</span><span class="o">));</span>
-</span><span class='line'>        <span class="k">while</span> <span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">next</span><span class="o">());</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/11/23/strategy-and-factory-design-patter-with-interface/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -461,6 +390,10 @@ Since the fields are static,they are initialized when the class is first loaded,
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程字节排序的诡异问题</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/04/24/short-notes/">short notes</a>
@@ -496,10 +429,6 @@ Since the fields are static,they are initialized when the class is first loaded,
     
       <li class="post">
         <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a>
       </li>
     
   </ul>
@@ -545,6 +474,7 @@ Since the fields are static,they are initialized when the class is first loaded,
   <li><a href='/blog/categories/php'>Php</a></li>
   <li><a href='/blog/categories/security'>Security</a></li>
   <li><a href='/blog/categories/shell'>Shell</a></li>
+  <li><a href='/blog/categories/tcp-ip'>Tcp/ip</a></li>
 </ul>
 </section>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2014-04-24T00:53:09+08:00</updated>
+  <updated>2014-05-13T04:30:43+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -12,6 +12,209 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[socket编程字节排序的诡异问题]]></title>
+    <link href="http://FightingMan.github.com/blog/2014/05/13/doubt-of-host-byte-order/"/>
+    <updated>2014-05-13T03:00:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2014/05/13/doubt-of-host-byte-order</id>
+    <content type="html"><![CDATA[<p>通常大家这样绑定某个地址</p>
+
+<figure class='code'><figcaption><span>server.cpp </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果网卡多，只想在某一网卡的某个地址上bind怎么办呢？就需要指定s_addr的地址
+比如:192.168.1.102</p>
+
+<figure class='code'><figcaption><span>main.cpp </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="c1">//main.cpp</span>
+</span><span class='line'>    <span class="n">include</span> <span class="o">&lt;</span><span class="n">iostream</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="cp">#include &quot;server.h&quot;</span>
+</span><span class='line'>    <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">)</span>  <span class="p">{</span>
+</span><span class='line'>                <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Usage: ftsrv &lt;address&gt; &lt;port&gt; &lt;doc_root&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">ftsrv</span><span class="o">::</span><span class="n">server</span> <span class="n">s</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+</span><span class='line'>            <span class="n">s</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cerr</span> <span class="o">&lt;&lt;</span>
+</span><span class='line'>                <span class="s">&quot;exception:&quot;</span> <span class="o">&lt;&lt;</span><span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span><span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">return0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//server.h</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="k">explicit</span> <span class="n">server</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">address_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">port_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">doc_root_</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!--more-->
+
+
+<p>接着我们在server.cpp具体函数里面实现转换，将addr转为in_addr_t类型（uint32）</p>
+
+<figure class='code'><figcaption><span>main.cpp </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">address</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">address_</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">address</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error on inet_pton&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//由于s_addr必须是大端字节序</span>
+</span><span class='line'>    <span class="n">address</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="err">然后起</span><span class="n">socket</span><span class="err">执行一系列函数</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serv_addr</span><span class="p">,</span> <span class="n">cli_addr</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span> <span class="o">=</span> <span class="n">address</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">serv_addr</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error on binding&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.
+如何检查自己的系统的主机字节序很简单：</p>
+
+<figure class='code'><figcaption><span>main.c </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'>    <span class="k">union</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">short</span>  <span class="n">s</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">char</span>   <span class="n">c</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">)];</span>
+</span><span class='line'>    <span class="p">}</span> <span class="n">un</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">un</span><span class="p">.</span><span class="n">s</span> <span class="o">=</span> <span class="mh">0x0102</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;big-endian</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>                <span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;little-endian</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;unknown</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;sizeof(short) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后在inet.h的宏定义中看到
+Liquid error: ClassNotFound: no lexer for alias &#8216;h&#8217; found
+默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
+但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。
+下面给段demo程序：</p>
+
+<figure class='code'><figcaption><span>demo.c </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'>    <span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'>    <span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>    <span class="cp">#include &lt;arpa/inet.h&gt;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">char</span> <span class="n">s</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">address</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">address</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%i --- %i --- %i&quot;</span><span class="p">,</span> <span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">htonl</span><span class="p">(</span><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">),</span> <span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>翻过pton()和memcpy(),aton()函数源码还是没找到.
+记录到这里，以免以后忘了，有空再研究.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[short notes]]></title>
@@ -1640,148 +1843,6 @@ TO solve it, you must set value of base_url in config.php</p>
 
 <pre><code>class foo implements bar{} //Note: you must implements all the methods in the interface:bar,also this class can be abstract.
 </code></pre></blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Polymorphism two]]></title>
-    <link href="http://FightingMan.github.com/blog/2012/11/04/polymorphism-two/"/>
-    <updated>2012-11-04T21:08:00+08:00</updated>
-    <id>http://FightingMan.github.com/blog/2012/11/04/polymorphism-two</id>
-    <content type="html"><![CDATA[<p>Covariant return types</p>
-
-<blockquote><p>An overridden method in a derived class can return a type derived from the type returned by the base class method.</p></blockquote>
-
-<figure class='code'><figcaption><span>CovariantReturn.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">class</span> <span class="nc">Grain</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="k">return</span> <span class="s">&quot;Grain&quot;</span><span class="o">;</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">Wheat</span> <span class="kd">extends</span> <span class="nf">Grain</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="k">return</span> <span class="s">&quot;Wheat&quot;</span><span class="o">;</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">Mill</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">Grain</span> <span class="nf">process</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="k">return</span> <span class="k">new</span> <span class="nf">Grain</span><span class="o">();</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">WheatMill</span> <span class="kd">extends</span> <span class="n">Mill</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">Wheat</span> <span class="nf">process</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="k">return</span> <span class="k">new</span> <span class="nf">Wheat</span><span class="o">();</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nc">CovariantReturn</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">Mill</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Mill</span><span class="o">();</span>
-</span><span class='line'>                <span class="n">Grain</span> <span class="n">g</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">process</span><span class="o">();</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
-</span><span class='line'>                <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WheatMill</span><span class="o">();</span>
-</span><span class='line'>                <span class="n">g</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">process</span><span class="o">;</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span><span class="c1">//output:</span>
-</span><span class='line'>        <span class="n">Grain</span>
-</span><span class='line'>        <span class="n">Wheat</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!--more-->
-
-
-<p>Designing with inheritance</p>
-
-<p>1.The better approach is to choose composition first,when it&#8217;s not obvious which one you should use,composition is also more flexible since it&#8217;s possible to dynamically choose a type. A general guideline is: Use inheritance to express diffeences in behavior, and fields to express variations in state, this is also called the State Pattern.</p>
-
-<p>2.Substitution vs. extension</p>
-
-<pre><code>"Is-a" relationship: the interface of a class establishes what it is, inheritance guarantees that any derived class will have the interface of the base class and nothing less.
-"Is-like-a" relationship: the derived class is like the base class it has the same fundamental interface but it has other features that require additional methods to implement.
-</code></pre>
-
-<p>3.Downcasting and runtime type information</p>
-
-<blockquote><p>When we design with is-like-a and via an upcast,we must lose the specific type information.The solution is downcast, in java every cast is checked! so even though it looks you&#8217;re just performing an ordinary parenthesized cast, at run time this cast is checked to ensure that it is in fast the type you think it is.</p></blockquote>
-
-<figure class='code'><figcaption><span>Downcast.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>        <span class="kd">class</span> <span class="nc">sup</span> <span class="o">{}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">class</span> <span class="nc">sub</span> <span class="kd">extends</span> <span class="n">sup</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">only</span><span class="o">()</span> <span class="o">{}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="kd">public</span> <span class="kd">class</span> <span class="nf">Downcast</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">sup</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sub</span><span class="o">();</span>
-</span><span class='line'>                <span class="c1">//!s.only() compile time : method not found in sup;</span>
-</span><span class='line'>                <span class="o">((</span><span class="n">sub</span><span class="o">)</span><span class="n">s</span><span class="o">).</span><span class="na">only</span><span class="o">();</span><span class="c1">// Downcast/runtime type information.</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
 ]]></content>
   </entry>
   

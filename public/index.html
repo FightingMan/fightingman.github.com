@@ -9,9 +9,10 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="好记性不如烂笔头，很久没写博客了，重新开始吧。
-我这种半路出家的酱油程序员，最近看算法学习了很多东西,很多东西有耳目一醒的感觉。
-今天看到一道题，对位的操作算是，第一次比较熟悉的用了下： 如何判断n的第i位是否为1：n &amp; (1 &lt;&lt; i). 顺便想了下之前对位操作的总结： &hellip;">
+  <meta name="description" content="通常大家这样绑定某个地址 server.cpp 1
+2
+3 ... serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); ... 如果网卡多，只想在某一网卡的某个地址上bind怎么办呢？就需要指定s_addr的地址
+比如:192.168.1.102 main &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +67,116 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/05/13/doubt-of-host-byte-order/">Socket编程字节排序的诡异问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-13T03:00:00+08:00" pubdate data-updated="true">May 13<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/05/13/doubt-of-host-byte-order/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>通常大家这样绑定某个地址</p>
+
+<figure class='code'><figcaption><span>server.cpp </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果网卡多，只想在某一网卡的某个地址上bind怎么办呢？就需要指定s_addr的地址
+比如:192.168.1.102</p>
+
+<figure class='code'><figcaption><span>main.cpp </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="c1">//main.cpp</span>
+</span><span class='line'>    <span class="n">include</span> <span class="o">&lt;</span><span class="n">iostream</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="cp">#include &quot;server.h&quot;</span>
+</span><span class='line'>    <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">)</span>  <span class="p">{</span>
+</span><span class='line'>                <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Usage: ftsrv &lt;address&gt; &lt;port&gt; &lt;doc_root&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">ftsrv</span><span class="o">::</span><span class="n">server</span> <span class="n">s</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+</span><span class='line'>            <span class="n">s</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cerr</span> <span class="o">&lt;&lt;</span>
+</span><span class='line'>                <span class="s">&quot;exception:&quot;</span> <span class="o">&lt;&lt;</span><span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span><span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">return0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//server.h</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="k">explicit</span> <span class="n">server</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">address_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">port_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">doc_root_</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/05/13/doubt-of-host-byte-order/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -308,168 +419,6 @@ int(-129)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/12/08/an-interesting-thing-occurs-while-a-class-inside-interface/">An Interesting Thing Occurs While a Class Inside Interface</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-12-08T22:08:00+08:00" pubdate data-updated="true">Dec 8<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/12/08/an-interesting-thing-occurs-while-a-class-inside-interface/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>While I’m putting class inside interface with anonymous,something interested occurs.</p>
-
-<figure class='code'><figcaption><span>As21.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">Comm</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">class</span> <span class="nc">Inner</span> <span class="kd">implements</span> <span class="n">Comm</span> <span class="o">{</span>
-</span><span class='line'>        <span class="kd">static</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">(</span><span class="n">Comm</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">c</span><span class="o">.</span><span class="na">v</span><span class="o">();</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">interface</span> <span class="nc">Diff</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">class</span> <span class="nc">Differ</span> <span class="kd">implements</span> <span class="n">Comm</span> <span class="o">{</span>
-</span><span class='line'>        <span class="kd">static</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">(</span><span class="n">Comm</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">c</span><span class="o">.</span><span class="na">v</span><span class="o">();</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">As21</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Comm</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Comm</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;as21&quot;</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>        <span class="o">};</span>
-</span><span class='line'>        <span class="n">Comm</span><span class="o">.</span><span class="na">Inner</span><span class="o">.</span><span class="na">f</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">As22</span> <span class="kd">implements</span> <span class="n">Comm</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;as22&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">As22</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">As22</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">Inner</span><span class="o">.</span><span class="na">f</span><span class="o">(</span><span class="n">a</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">Diff</span><span class="o">.</span><span class="na">Differ</span><span class="o">.</span><span class="na">g</span><span class="o">(</span><span class="n">a</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As you can see,As21 is the one which I wantted,but the interesting thing occurs in As22. First,any class you put inside an interface is automatically public and static. Then As22 implements the Comm interface so it can call f() method directly with using Inner.f() witout Comm in front of it, but the method f() in Diff interface cannot called directly,must use Diff.differ.f().</p>
-
-<p>In addition,how to execute the program in command line while put classes inside interfaces?</p>
-
-<p>e.g.</p>
-
-<figure class='code'><figcaption><span>As20.java </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">As20</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">class</span> <span class="nc">Inner</span> <span class="kd">implements</span> <span class="n">As20</span> <span class="o">{</span>
-</span><span class='line'>        <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="s">&quot;test&quot;</span><span class="o">;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">Inner</span> <span class="n">i</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Inner</span><span class="o">();</span>
-</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<blockquote><p>javac As20.java</p>
-
-<p>java As20\$Inner</p></blockquote>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -483,6 +432,10 @@ int(-129)
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程字节排序的诡异问题</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/04/24/short-notes/">short notes</a>
@@ -518,10 +471,6 @@ int(-129)
     
       <li class="post">
         <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a>
       </li>
     
   </ul>
@@ -567,6 +516,7 @@ int(-129)
   <li><a href='/blog/categories/php'>Php</a></li>
   <li><a href='/blog/categories/security'>Security</a></li>
   <li><a href='/blog/categories/shell'>Shell</a></li>
+  <li><a href='/blog/categories/tcp-ip'>Tcp/ip</a></li>
 </ul>
 </section>
 

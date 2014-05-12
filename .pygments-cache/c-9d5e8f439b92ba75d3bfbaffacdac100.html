@@ -1,0 +1,21 @@
+<div class="highlight"><pre><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="err">#</span><span class="n">include</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">stdlib</span><span class="p">.</span><span class="n">h</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>
+<span class="cp">#include &amp;lt;stdio.h&amp;gt;</span>
+<span class="cp">#include &amp;lt;arpa/inet.h&amp;gt;</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">s</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">address</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">address</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%i --- %i --- %i&quot;</span><span class="p">,</span> <span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">,</span>
+            <span class="n">htonl</span><span class="p">(</span><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">),</span> <span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</pre>
+</div>

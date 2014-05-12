@@ -1,0 +1,16 @@
+<div class="highlight"><pre>    <span class="cp">#include &lt;stdlib.h&gt;</span>
+    <span class="cp">#include &lt;stdio.h&gt;</span>
+    <span class="cp">#include &lt;arpa/inet.h&gt;</span>
+    <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">s</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+        <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">address</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">address</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%i --- %i --- %i&quot;</span><span class="p">,</span> <span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">,</span>
+                <span class="n">htonl</span><span class="p">(</span><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">),</span> <span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+</pre>
+</div>

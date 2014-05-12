@@ -9,7 +9,27 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Today I&#8217;m testing metasploit in bt5,there is a problem takes me some time,yes,this is a bug,show these codes: root@bt:~# cd /opt/metasploit/ &hellip;">
+  <meta name="description" content="While I’m putting class inside interface with anonymous,something interested occurs. As21.java 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +84,168 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/08/an-interesting-thing-occurs-while-a-class-inside-interface/">An Interesting Thing Occurs While a Class Inside Interface</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-08T22:08:00+08:00" pubdate data-updated="true">Dec 8<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/12/08/an-interesting-thing-occurs-while-a-class-inside-interface/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>While I’m putting class inside interface with anonymous,something interested occurs.</p>
+
+<figure class='code'><figcaption><span>As21.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">Comm</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">class</span> <span class="nc">Inner</span> <span class="kd">implements</span> <span class="n">Comm</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">static</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">(</span><span class="n">Comm</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">c</span><span class="o">.</span><span class="na">v</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">interface</span> <span class="nc">Diff</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">class</span> <span class="nc">Differ</span> <span class="kd">implements</span> <span class="n">Comm</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">static</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">(</span><span class="n">Comm</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">c</span><span class="o">.</span><span class="na">v</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">As21</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Comm</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Comm</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;as21&quot;</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">};</span>
+</span><span class='line'>        <span class="n">Comm</span><span class="o">.</span><span class="na">Inner</span><span class="o">.</span><span class="na">f</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">As22</span> <span class="kd">implements</span> <span class="n">Comm</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">v</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;as22&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">As22</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">As22</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">Inner</span><span class="o">.</span><span class="na">f</span><span class="o">(</span><span class="n">a</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">Diff</span><span class="o">.</span><span class="na">Differ</span><span class="o">.</span><span class="na">g</span><span class="o">(</span><span class="n">a</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see,As21 is the one which I wantted,but the interesting thing occurs in As22. First,any class you put inside an interface is automatically public and static. Then As22 implements the Comm interface so it can call f() method directly with using Inner.f() witout Comm in front of it, but the method f() in Diff interface cannot called directly,must use Diff.differ.f().</p>
+
+<p>In addition,how to execute the program in command line while put classes inside interfaces?</p>
+
+<p>e.g.</p>
+
+<figure class='code'><figcaption><span>As20.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">interface</span> <span class="nc">As20</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">class</span> <span class="nc">Inner</span> <span class="kd">implements</span> <span class="n">As20</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s">&quot;test&quot;</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">Inner</span> <span class="n">i</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Inner</span><span class="o">();</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>javac As20.java</p>
+
+<p>java As20\$Inner</p></blockquote>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -337,63 +519,6 @@ Prepare 15 servers:172.16.103.200~172.16.103.214</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-28T22:16:00+08:00" pubdate data-updated="true">Nov 28<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Sharding is the method Mongodb uses to split a large collection across several servers(called a cluster).</p>
-
-<p>A Mongodb cluster basically consists of three types of processes:the shards for actually storing data, the mongos processes for routing requests to the correct data,and the config servers,for keeping track of the cluster&#8217;s state.</p>
-
-<p><img src="/images/MongodbCluster.jpeg"></p>
-
-<blockquote><ol>
-<li>The Config Servers:
-  Config servers hold the definitive information about the cluster for everyone&#8217;s access (shards,mongos processes, and system administrtors).</li>
-<li>Mongos:
-  Mongos is the interaction point  between users and the cluster..Its job is to hide all of the gooey internals of sharding  and present a clean, single-server interface to the user.Mongos can help you to use targeted query if you query involves the shard key.</li>
-<li>Shards:
-  A shard is one or more servers in a cluster that are responsible for some subset of the data(more than one server used for replica set usually).</li>
-</ol>
-</blockquote>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -409,6 +534,10 @@ Prepare 15 servers:172.16.103.200~172.16.103.214</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程字节排序的诡异问题</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/04/24/short-notes/">short notes</a>
@@ -444,10 +573,6 @@ Prepare 15 servers:172.16.103.200~172.16.103.214</p>
     
       <li class="post">
         <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/28/summary-of-understanding-mongodb-sharding/">Summary of Understanding Mongodb Sharding</a>
       </li>
     
   </ul>
@@ -493,6 +618,7 @@ Prepare 15 servers:172.16.103.200~172.16.103.214</p>
   <li><a href='/blog/categories/php'>Php</a></li>
   <li><a href='/blog/categories/security'>Security</a></li>
   <li><a href='/blog/categories/shell'>Shell</a></li>
+  <li><a href='/blog/categories/tcp-ip'>Tcp/ip</a></li>
 </ul>
 </section>
 

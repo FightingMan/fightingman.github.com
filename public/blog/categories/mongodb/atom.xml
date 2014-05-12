@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mongodb | FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/blog/categories/mongodb/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2014-04-24T00:53:09+08:00</updated>
+  <updated>2014-05-13T04:30:45+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[<p>Previous article showed some basic theories of Mongodb sharding,now we'll demonstrate it.
 Prepare 15 servers:172.16.103.200~172.16.103.214</p>
 
-<p><img src="/images/demo.jpeg"></p>
+<p>{% img /images/demo.jpeg %}</p>
 
 <p>Suppose you had been installed mongodb in /usr/local/mongdb and its structure:</p>
 
@@ -170,7 +170,7 @@ How much data is there,total?
 
 <p>A Mongodb cluster basically consists of three types of processes:the shards for actually storing data, the mongos processes for routing requests to the correct data,and the config servers,for keeping track of the cluster's state.</p>
 
-<p><img src="/images/MongodbCluster.jpeg"></p>
+<p>{% img /images/MongodbCluster.jpeg %}</p>
 
 <blockquote><ol>
 <li>The Config Servers:
@@ -188,36 +188,23 @@ How much data is there,total?
 <p>Shard key And Chunk</p>
 
 <blockquote><p>The key you choose to use for chunk ranges is called a shard key(can be any field or combination of fields).e.g.
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Suppose our collection had documents that looked like this (_ids omitted):
-</span><span class='line'>{"username" : "paul", "age" : 23}
-</span><span class='line'>{"username" : "simon", "age" : 17}
-</span><span class='line'>{"username" : "widdly", "age" : 16}
-</span><span class='line'>{"username" : "scuds", "age" : 95}
-</span><span class='line'>{"username" : "grill", "age" : 18}
-</span><span class='line'>{"username" : "flavored", "age" : 55}
-</span><span class='line'>{"username" : "bertango", "age" : 73}
-</span><span class='line'>{"username" : "wooster", "age" : 33}
-</span><span class='line'>If we choose the age field as a shard key and end up with a chunk range [15, 26),
-</span><span class='line'>thechunk would contain the following documents:
-</span><span class='line'>{"username" : "paul", "age" : 23}
-</span><span class='line'>{"username" : "simon", "age" : 17}
-</span><span class='line'>{"username" : "widdly", "age" : 16}
-</span><span class='line'>{"username" : "grill", "age" : 18}</span></code></pre></td></tr></table></div></figure></notextile></div>
+{% codeblock %}
+Suppose our collection had documents that looked like this (_ids omitted):
+{"username" : "paul", "age" : 23}
+{"username" : "simon", "age" : 17}
+{"username" : "widdly", "age" : 16}
+{"username" : "scuds", "age" : 95}
+{"username" : "grill", "age" : 18}
+{"username" : "flavored", "age" : 55}
+{"username" : "bertango", "age" : 73}
+{"username" : "wooster", "age" : 33}
+If we choose the age field as a shard key and end up with a chunk range [15, 26),
+thechunk would contain the following documents:
+{"username" : "paul", "age" : 23}
+{"username" : "simon", "age" : 17}
+{"username" : "widdly", "age" : 16}
+{"username" : "grill", "age" : 18}
+{% endcodeblock %}
 When you first shard a collection , Mongodb creates a single chunk for whatever data is in the collection,and the has a range of (-∞,+∞),until you inserted more data,-∞ is the smallest value ,+∞ is the largest value.
 If you insert enough data into the shards,Mongodb would split the initial chunk into two chunks around the midpoint.So,if approximately half of the documents had a an age field less than 15 and halst were greater than 15(above demo),Mongodb might choose 15 as th midpoint.Then we had two chunks:(-∞,15),[15,+∞).If we continued to insert data into the [15,+∞)chunk,it could be split again,so we have three chunks:(-∞,15),[15,midpoint),[midpoint,+∞).As we insert more data,Mongodb will continued to split existing chunks to create new chunks.
 We also can hava a chunk with a single value,but every chunk's range must be distincti.you cannot have overlapping chunks,each chunk's range must exactly meet the next chunk's range.e.g.</p>
@@ -241,15 +228,15 @@ The goal of the balancer is not only to keep the data evenly distributed but als
 
 <blockquote><p>Allowing multiple,non-consesutive ranges in a shard allow us to pick and choose data and move it.</p></blockquote>
 
-<p><img src="/images/move1.jpeg"></p>
+<p>{% img /images/move1.jpeg %}</p>
 
 <blockquote><p>When a new shard is added,everyone can contribute data to it directly.</p></blockquote>
 
-<p><img src="/images/move2.jpeg"></p>
+<p>{% img /images/move2.jpeg %}</p>
 
 <blockquote><p>For a balancing round to occur, a shard must have at leat nine more chunks than the least-populous shard,so chunks will be migrated off of the crowed shard until it is even with the rest of the shards,because Mongodb wants to avoid sending the same data back and forth.Also keep in mind nine chunks is not even that much of an imbalance-it is less than 2GB of data,as Mongodb want minimize pointless data transfers.</p></blockquote>
 
-<p><img src="/images/avoid.jpeg"></p>
+<p>{% img /images/avoid.jpeg %}</p>
 
 <p>Notice:In a real system, chunks are only 64MB by default,also you can change it in megabytes(db.settings.save( { _id:"chunksize", value: <size>}))</p>
 ]]></content>
