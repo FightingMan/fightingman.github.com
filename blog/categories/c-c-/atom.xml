@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C/C++ | FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/blog/categories/c-c-/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2014-05-13T05:00:56+08:00</updated>
+  <updated>2014-05-13T22:23:35+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -14,271 +14,270 @@
 
   
   <entry>
+    <title type="html"><![CDATA[big and little endian in inet_pton()]]></title>
+    <link href="http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton/"/>
+    <updated>2014-05-13T21:42:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton</id>
+    <content type="html"><![CDATA[<p>今天弄懂了昨天那篇文章<a href="http://www.fightingman.org/blog/2014/05/13/doubt-of-host-byte-order/">Socket编程遇到字节排序的诡异问题</a>里的疑惑:
+{% codeblock main.c %}</p>
+
+<h1>include &lt;stdlib.h></h1>
+
+<h1>include &lt;stdio.h></h1>
+
+<h1>include &lt;arpa/inet.h></h1>
+
+<p>int main() {</p>
+
+<pre><code>struct in_addr addr;
+inet_pton(AF_INET, "127.0.0.1", &amp;addr);
+printf("%x\n", addr.s_addr);
+return 0;
+</code></pre>
+
+<p>}
+{% endcodeblock %}</p>
+
+<pre><code>输出：100007f
+</code></pre>
+
+<p>开始就觉得很不解，127.0.0.1转为网码不是应该7f000001吗，为什么这里会这么奇怪而且头文件里面定义的</p>
+
+<pre><code># define INADDR_LOOPBACK    ((unsigned long int) 0x7f000001)
+</code></pre>
+
+<p>也确实是7f000001，后来再次翻了inet_pton()函数的源码
+{% codeblock inet_pton.c %}
+int
+inet_pton(af, src, dst)</p>
+
+<pre><code>int af;
+const char *src;
+void *dst;
+</code></pre>
+
+<p>{</p>
+
+<pre><code>switch (af) {
+case AF_INET:
+    return (inet_pton4(src, dst));
+case AF_INET6:
+    return (inet_pton6(src, dst));
+default:
+    __set_errno (EAFNOSUPPORT);
+    return (-1);
+}
+/* NOTREACHED */
+</code></pre>
+
+<p>}
+libc_hidden_def (inet_pton)</p>
+
+<p>static int
+internal_function
+inet_pton4(src, dst)</p>
+
+<pre><code>const char *src;
+u_char *dst;
+</code></pre>
+
+<p>{</p>
+
+<pre><code>int saw_digit, octets, ch;
+u_char tmp[NS_INADDRSZ], *tp;
+
+saw_digit = 0;
+octets = 0;
+*(tp = tmp) = 0;
+while ((ch = *src++) != '\0') {
+
+    if (ch &gt;= '0' &amp;&amp; ch &lt;= '9') {
+        u_int new = *tp * 10 + (ch - '0');
+
+        if (saw_digit &amp;&amp; *tp == 0)
+            return (0);
+        if (new &gt; 255)
+            return (0);
+        *tp = new;
+        if (! saw_digit) {
+            if (++octets &gt; 4)
+                return (0);
+            saw_digit = 1;
+        }
+    } else if (ch == '.' &amp;&amp; saw_digit) {
+        if (octets == 4)
+            return (0);
+        *++tp = 0;
+        saw_digit = 0;
+    } else
+        return (0);
+}
+if (octets &lt; 4)
+    return (0);
+memcpy(dst, tmp, NS_INADDRSZ);
+return (1);
+</code></pre>
+
+<p>}
+{% endcodeblock %}</p>
+
+<!--more-->
+
+
+<p>看到inet_pton4函数里面实际是按127.0.0.1的顺序直接存到内存的：</p>
+
+<pre><code>127.0.0.1转为网码为7f 00 00 01 ，由于我电脑是pc是小端，
+将这个变量写到变量里会存为 01 00 00 7f,但是这个函数直接通过内存地址存入的7f 00 00
+01,我们通过printf函数打印的时候又因为计算机本来是小端字节序，
+会从右往左读就会是01 00 00 7f了，因为相当于inet_pton这个函数帮我们做了一次htonl()。
+</code></pre>
+
+<p>这就是为什么INADDR_LOOPBACK被定义为0x7f000001,却任然需要显示调用htonl(),<br/>
+而通过inet_pton()函数转换过的地址不能调用inet_htonl()的原因了.<br/>
+非常感谢laeder礼刚平时对我的帮助，良师益友，虽然我们再过1个多来月就要各奔东西了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[socket编程遇到字节排序的诡异问题]]></title>
     <link href="http://FightingMan.github.com/blog/2014/05/13/doubt-of-host-byte-order/"/>
     <updated>2014-05-13T03:00:00+08:00</updated>
     <id>http://FightingMan.github.com/blog/2014/05/13/doubt-of-host-byte-order</id>
     <content type="html"><![CDATA[<p>通常大家这样绑定某个地址
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>server.cpp </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="p">...</span>
-</span><span class='line'><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+{% codeblock server.cpp %}</p>
+
+<pre><code>...
+serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+...
+</code></pre>
+
+<p>{% endcodeblock %}
 如果网卡多，只想在某一网卡的某个地址上bind怎么办呢？就需要指定s_addr的地址
 比如:192.168.1.102</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>main.cpp </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="c1">//main.cpp</span>
-</span><span class='line'><span class="n">include</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">iostream</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>
-</span><span class='line'><span class="cp">#include &quot;server.h&quot;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">try</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">)</span>  <span class="p">{</span>
-</span><span class='line'>            <span class="n">cerr</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot;Usage: ftsrv &amp;lt;address&amp;gt; &amp;lt;port&amp;gt; &amp;lt;doc_root&amp;gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="n">ftsrv</span><span class="o">::</span><span class="n">server</span> <span class="n">s</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
-</span><span class='line'>        <span class="n">s</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="n">exception</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cerr</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span>
-</span><span class='line'>            <span class="s">&quot;exception:&quot;</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">return0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="c1">//server.h</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="k">explicit</span> <span class="n">server</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">address_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">port_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">doc_root_</span><span class="p">);</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p>{% codeblock main.cpp %}</p>
+
+<pre><code>//main.cpp
+include &lt;iostream&gt;
+#include "server.h"
+using namespace std;
+
+int main(int argc, char* argv[]) {
+    try {
+        if (argc != 4)  {
+            cerr &lt;&lt; "Usage: ftsrv &lt;address&gt; &lt;port&gt; &lt;doc_root&gt;\n";
+            return 1;
+        }
+        ftsrv::server s(argv[1], argv[2], argv[3]);
+        s.run();
+    } catch(exception&amp; e) {
+        cerr &lt;&lt;
+            "exception:" &lt;&lt;e.what()&lt;&lt; "\n";
+    }   
+
+    return0;
+}
+//server.h
+...
+explicit server(const string&amp; address_, const string&amp; port_, const string&amp; doc_root_);
+...
+</code></pre>
+
+<p>{% endcodeblock %}</p>
 
 <!--more-->
 
 
 <p>接着我们在server.cpp具体函数里面实现转换，将addr转为in_addr_t类型（uint32）
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>main.cpp </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="p">...</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">in_addr</span> <span class="n">address</span><span class="p">;</span>
-</span><span class='line'><span class="k">if</span> <span class="p">((</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">address_</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">address</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">cerr</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot;Error on inet_pton&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="c1">//由于s_addr必须是大端字节序</span>
-</span><span class='line'><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">);</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="err">然后起</span><span class="n">socket</span><span class="err">执行一系列函数</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serv_addr</span><span class="p">,</span> <span class="n">cli_addr</span><span class="p">;</span>
-</span><span class='line'><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
-</span><span class='line'><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span> <span class="o">=</span> <span class="n">address</span><span class="p">;</span>
-</span><span class='line'><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">serv_addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">serv_addr</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">cerr</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="s">&quot;Error on binding&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.
-如何检查自己的系统的主机字节序很简单：
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>main.c </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">union</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">short</span>  <span class="n">s</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">char</span>   <span class="n">c</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">)];</span>
-</span><span class='line'><span class="p">}</span> <span class="n">un</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">un</span><span class="p">.</span><span class="n">s</span> <span class="o">=</span> <span class="mh">0x0102</span><span class="p">;</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;big-endian</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;little-endian</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;unknown</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;sizeof(short) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">));</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+{% codeblock main.cpp %}</p>
+
+<pre><code>...
+struct in_addr address;
+if ((inet_pton(AF_INET, address_.c_str(), &amp;address)) != 1) {
+    cerr &lt;&lt; "Error on inet_pton";
+}
+//由于s_addr必须是大端字节序
+address.s_addr = htonl(address.s_addr);
+...
+然后起socket执行一系列函数
+...
+struct sockaddr_in serv_addr, cli_addr;
+serv_addr.sin_family = AF_INET;
+serv_addr.sin_addr = address;
+serv_addr.sin_port = htons(port);
+if (bind(sockfd, (struct sockaddr *) &amp;serv_addr, sizeof(serv_addr)) != 0) {
+    cerr &lt;&lt; "Error on binding";
+}
+...
+</code></pre>
+
+<p>{% endcodeblock %}
+然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.<br/>
+如何检查自己的系统的主机字节序很简单：<br/>
+{% codeblock main.c %}</p>
+
+<pre><code>union {
+    short  s;
+    char   c[sizeof(short)];
+} un;
+
+un.s = 0x0102;
+if (sizeof(short) == 2) {
+    if (un.c[0] == 1 &amp;&amp; un.c[1] == 2)
+        printf("big-endian\n");
+    else if (un.c[0] == 2 &amp;&amp;
+            un.c[1] == 1)
+        printf("little-endian\n");
+    else
+        printf("unknown\n");
+} else {
+    printf("sizeof(short) = %d\n", sizeof(short));
+}
+</code></pre>
+
+<p>{% endcodeblock %}
 最后在inet.h的宏定义中看到
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>#ifndef INADDR_ANY
-</span><span class='line'># define INADDR_ANY ((unsigned long int) 0x00000000)
-</span><span class='line'>#endif /* INADDR_ANY */
-</span><span class='line'>
-</span><span class='line'>#ifndef INADDR_LOOPBACK
-</span><span class='line'># define INADDR_LOOPBACK    ((unsigned long int) 0x7f000001)
-</span><span class='line'>#endif /* INADDR_LOOPBACK */
-</span><span class='line'>
-</span><span class='line'>#ifndef INADDR_NONE
-</span><span class='line'># define INADDR_NONE    0xffffffff
-</span><span class='line'>#endif /* INADDR_NONE */
-</span><span class='line'>&lt;/code>&lt;/pre>
-</span><span class='line'>
-</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div>
-默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
-但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。
+{% codeblock %}</p>
+
+<pre><code>#ifndef INADDR_ANY
+# define INADDR_ANY ((unsigned long int) 0x00000000)
+#endif /* INADDR_ANY */
+
+#ifndef INADDR_LOOPBACK
+# define INADDR_LOOPBACK    ((unsigned long int) 0x7f000001)
+#endif /* INADDR_LOOPBACK */
+
+#ifndef INADDR_NONE
+# define INADDR_NONE    0xffffffff
+#endif /* INADDR_NONE */
+</code></pre>
+
+<p>{% endcodeblock %}
+默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。<br/>
+但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。<br/>
 下面给段demo程序：
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>demo.c </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="err">#</span><span class="n">include</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">stdlib</span><span class="p">.</span><span class="n">h</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>
-</span><span class='line'><span class="cp">#include &amp;lt;stdio.h&amp;gt;</span>
-</span><span class='line'><span class="cp">#include &amp;lt;arpa/inet.h&amp;gt;</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="n">s</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">address</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">address</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%i --- %i --- %i&quot;</span><span class="p">,</span> <span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">,</span>
-</span><span class='line'>            <span class="n">htonl</span><span class="p">(</span><span class="n">address</span><span class="p">.</span><span class="n">s_addr</span><span class="p">),</span> <span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-翻过pton()和memcpy(),aton()函数源码还是没找到.
-记录到这里，以免以后忘了，有空再研究.</p>
+{% codeblock demo.c %}</p>
+
+<pre><code>#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;arpa/inet.h&gt;
+int main() {
+    char s[] = "127.0.0.1";
+    struct in_addr address;
+    if ((inet_pton(AF_INET, s, &amp;address)) != 1) {
+        return -1;
+    }
+
+    printf("%i --- %i --- %i", address.s_addr,
+            htonl(address.s_addr), INADDR_LOOPBACK);
+    return 0;
+}
+</code></pre>
+
+<p>{% endcodeblock %}
+翻过pton()和memcpy()函数源码还是没找到.<br/>
+记录到这里，以免以后忘了，有空再研究.<br/>
+备注：已解决,<a href="http://www.fightingman.org/blog/2014/05/13/big-and-little-endian-in-inet_pton/">地址</a></p>
 ]]></content>
   </entry>
   

@@ -209,7 +209,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.
+<p>然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.<br/>
 如何检查自己的系统的主机字节序很简单：</p>
 
 <figure class='code'><figcaption><span>main.c </span></figcaption>
@@ -276,8 +276,8 @@
 </span><span class='line'>    #endif /* INADDR_NONE */</span></code></pre></td></tr></table></div></figure>
 
 
-<p>默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
-但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。
+<p>默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。<br/>
+但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。<br/>
 下面给段demo程序：</p>
 
 <figure class='code'><figcaption><span>demo.c </span></figcaption>
@@ -312,8 +312,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>翻过pton()和memcpy(),aton()函数源码还是没找到.
-记录到这里，以免以后忘了，有空再研究.</p>
+<p>翻过pton()和memcpy()函数源码还是没找到.<br/>
+记录到这里，以免以后忘了，有空再研究.<br/>
+备注：已解决,<a href="http://www.fightingman.org/blog/2014/05/13/big-and-little-endian-in-inet_pton/">地址</a></p>
 </div>
 
 
@@ -360,6 +361,8 @@
         <a class="basic-alignment left" href="/blog/2014/04/24/short-notes/" title="Previous Post: short notes">&laquo; short notes</a>
       
       
+        <a class="basic-alignment right" href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/" title="Next Post: big and little endian in inet_pton()">big and little endian in inet_pton() &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -390,6 +393,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/">big and little endian in inet_pton()</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程遇到字节排序的诡异问题</a>
@@ -425,10 +432,6 @@
     
       <li class="post">
         <a href="/blog/2012/12/01/example-of-sharding-cluster/">Example of sharding cluster</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
       </li>
     
   </ul>
