@@ -9,7 +9,8 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Strategy design pattern When you write a method that performs certain operations,and that method takes an interface which you also specify,then the &hellip;">
+  <meta name="description" content="Fields in interface are automatically static and final,which means the interface is a convenient tool for creating groups of constant value.
+Since &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +65,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/23/fields-in-interface/">Fields in Interface</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-23T01:20:00+08:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/23/fields-in-interface/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Fields in interface are automatically static and final,which means the interface is a convenient tool for creating groups of constant value.
+Since the fields are static,they are initialized when the class is first loaded,which happens when any of the fields are accessed for the first time.The fields,of course,are not part of the interface.The values are stored in the static storage area for that interface.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -469,65 +509,6 @@ TO solve it, you must set value of base_url in config.php</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/13/abstract-class-and-pure-interface/">Abstract Class &amp; Pure Interface</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-13T01:04:00+08:00" pubdate data-updated="true">Nov 13<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/13/abstract-class-and-pure-interface/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Interface and abstract class provide more structured way to seprate interface from implemention.Java support this mechanisms directly.</p>
-
-<p>Abstract class and methods.</p>
-
-<blockquote><p>A method that is incomplete; it has only a declaration and no method body.</p>
-
-<pre><code>abstract void foo();
-</code></pre>
-
-<p>A class contains abstract methods is called abstract class.</p>
-
-<pre><code>abstract class bar{}
-</code></pre>
-
-<p>If you inherit from an abstract class and you want to make objects of new type, you must provide method definitions for all the abstract methods in the base class. If you don&#8217;t, then the derived class is also abstract, so you can&#8217;t new the abstract class,or make object of it.</p>
-
-<p>An abstract class is a class either,so you can use extends keyword.</p></blockquote>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/11/13/abstract-class-and-pure-interface/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -543,6 +524,10 @@ TO solve it, you must set value of base_url in config.php</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/">big and little endian in inet_pton()</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程遇到字节排序的诡异问题</a>
@@ -578,10 +563,6 @@ TO solve it, you must set value of base_url in config.php</p>
     
       <li class="post">
         <a href="/blog/2012/12/01/example-of-sharding-cluster/">Example of sharding cluster</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
       </li>
     
   </ul>

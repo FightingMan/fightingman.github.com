@@ -62,8 +62,8 @@ categories: Tcp/Ip C/C++
     }
     ...
 {% endcodeblock %}
-然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.
-如何检查自己的系统的主机字节序很简单：
+然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.  
+如何检查自己的系统的主机字节序很简单：  
 {% codeblock main.c %}
     union {
         short  s;
@@ -97,8 +97,8 @@ categories: Tcp/Ip C/C++
     # define INADDR_NONE    0xffffffff
     #endif /* INADDR_NONE */
 {% endcodeblock %}
-默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
-但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。
+默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。  
+但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。  
 下面给段demo程序：
 {% codeblock demo.c %}
     #include <stdlib.h>
@@ -116,5 +116,6 @@ categories: Tcp/Ip C/C++
         return 0;
     }
 {% endcodeblock %}
-翻过pton()和memcpy(),aton()函数源码还是没找到.
-记录到这里，以免以后忘了，有空再研究.
+翻过pton()和memcpy()函数源码还是没找到.  
+记录到这里，以免以后忘了，有空再研究.  
+备注：已解决,[地址](http://www.fightingman.org/blog/2014/05/13/big-and-little-endian-in-inet_pton/)

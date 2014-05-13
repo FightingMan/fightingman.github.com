@@ -1,0 +1,73 @@
+<div class="highlight"><pre><span class="kt">int</span>
+<span class="n">inet_pton</span><span class="p">(</span><span class="n">af</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">af</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">;</span>
+<span class="kt">void</span> <span class="o">*</span><span class="n">dst</span><span class="p">;</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">{</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">switch</span> <span class="p">(</span><span class="n">af</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">case</span> <span class="n">AF_INET</span>:
+    <span class="k">return</span> <span class="p">(</span><span class="n">inet_pton4</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">));</span>
+<span class="k">case</span> <span class="n">AF_INET6</span>:
+    <span class="k">return</span> <span class="p">(</span><span class="n">inet_pton6</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">));</span>
+<span class="nl">default:</span>
+    <span class="n">__set_errno</span> <span class="p">(</span><span class="n">EAFNOSUPPORT</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="cm">/* NOTREACHED */</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+<span class="n">libc_hidden_def</span> <span class="p">(</span><span class="n">inet_pton</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">static</span> <span class="kt">int</span>
+<span class="n">internal_function</span>
+<span class="n">inet_pton4</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">;</span>
+<span class="n">u_char</span> <span class="o">*</span><span class="n">dst</span><span class="p">;</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">{</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">saw_digit</span><span class="p">,</span> <span class="n">octets</span><span class="p">,</span> <span class="n">ch</span><span class="p">;</span>
+<span class="n">u_char</span> <span class="n">tmp</span><span class="p">[</span><span class="n">NS_INADDRSZ</span><span class="p">],</span> <span class="o">*</span><span class="n">tp</span><span class="p">;</span>
+
+<span class="n">saw_digit</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">octets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="o">*</span><span class="p">(</span><span class="n">tp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">((</span><span class="n">ch</span> <span class="o">=</span> <span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">)</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">ch</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">u_int</span> <span class="n">new</span> <span class="o">=</span> <span class="o">*</span><span class="n">tp</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="p">(</span><span class="n">ch</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">saw_digit</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="o">*</span><span class="n">tp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">new</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">255</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+        <span class="o">*</span><span class="n">tp</span> <span class="o">=</span> <span class="n">new</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">saw_digit</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">octets</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+            <span class="n">saw_digit</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">==</span> <span class="sc">&#39;.&#39;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">saw_digit</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">octets</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+        <span class="o">*++</span><span class="n">tp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">saw_digit</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">octets</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">memcpy</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">NS_INADDRSZ</span><span class="p">);</span>
+<span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</pre>
+</div>

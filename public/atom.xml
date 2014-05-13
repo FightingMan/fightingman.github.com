@@ -4,7 +4,7 @@
   <title><![CDATA[FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2014-05-13T05:00:56+08:00</updated>
+  <updated>2014-05-13T22:23:33+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -12,6 +12,188 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[big and little endian in inet_pton()]]></title>
+    <link href="http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton/"/>
+    <updated>2014-05-13T21:42:00+08:00</updated>
+    <id>http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton</id>
+    <content type="html"><![CDATA[<p>今天弄懂了昨天那篇文章<a href="http://www.fightingman.org/blog/2014/05/13/doubt-of-host-byte-order/">Socket编程遇到字节排序的诡异问题</a>里的疑惑:</p>
+
+<figure class='code'><figcaption><span>main.c </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;arpa/inet.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">addr</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%x</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">.</span><span class="n">s_addr</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code>输出：100007f
+</code></pre>
+
+<p>开始就觉得很不解，127.0.0.1转为网码不是应该7f000001吗，为什么这里会这么奇怪而且头文件里面定义的</p>
+
+<pre><code># define INADDR_LOOPBACK    ((unsigned long int) 0x7f000001)
+</code></pre>
+
+<p>也确实是7f000001，后来再次翻了inet_pton()函数的源码</p>
+
+<figure class='code'><figcaption><span>inet_pton.c </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span>
+</span><span class='line'><span class="n">inet_pton</span><span class="p">(</span><span class="n">af</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">af</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="o">*</span><span class="n">dst</span><span class="p">;</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">switch</span> <span class="p">(</span><span class="n">af</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">case</span> <span class="n">AF_INET</span>:
+</span><span class='line'>      <span class="k">return</span> <span class="p">(</span><span class="n">inet_pton4</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">));</span>
+</span><span class='line'>  <span class="k">case</span> <span class="n">AF_INET6</span>:
+</span><span class='line'>      <span class="k">return</span> <span class="p">(</span><span class="n">inet_pton6</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">));</span>
+</span><span class='line'>  <span class="nl">default:</span>
+</span><span class='line'>      <span class="n">__set_errno</span> <span class="p">(</span><span class="n">EAFNOSUPPORT</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="cm">/* NOTREACHED */</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">libc_hidden_def</span> <span class="p">(</span><span class="n">inet_pton</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">int</span>
+</span><span class='line'><span class="n">internal_function</span>
+</span><span class='line'><span class="n">inet_pton4</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">u_char</span> <span class="o">*</span><span class="n">dst</span><span class="p">;</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">saw_digit</span><span class="p">,</span> <span class="n">octets</span><span class="p">,</span> <span class="n">ch</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">u_char</span> <span class="n">tmp</span><span class="p">[</span><span class="n">NS_INADDRSZ</span><span class="p">],</span> <span class="o">*</span><span class="n">tp</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">saw_digit</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">octets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">*</span><span class="p">(</span><span class="n">tp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">while</span> <span class="p">((</span><span class="n">ch</span> <span class="o">=</span> <span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">)</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">&gt;=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">ch</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="n">u_int</span> <span class="n">new</span> <span class="o">=</span> <span class="o">*</span><span class="n">tp</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="p">(</span><span class="n">ch</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="n">saw_digit</span> <span class="o">&amp;&amp;</span> <span class="o">*</span><span class="n">tp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="n">new</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>          <span class="o">*</span><span class="n">tp</span> <span class="o">=</span> <span class="n">new</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">saw_digit</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">octets</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)</span>
+</span><span class='line'>                  <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>              <span class="n">saw_digit</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">==</span> <span class="sc">&#39;.&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">saw_digit</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="n">octets</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>          <span class="o">*++</span><span class="n">tp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>          <span class="n">saw_digit</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span>
+</span><span class='line'>          <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">octets</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">memcpy</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">NS_INADDRSZ</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!--more-->
+
+
+<p>看到inet_pton4函数里面实际是按127.0.0.1的顺序直接存到内存的：</p>
+
+<pre><code>127.0.0.1转为网码为7f 00 00 01 ，由于我电脑是pc是小端，
+将这个变量写到变量里会存为 01 00 00 7f,但是这个函数直接通过内存地址存入的7f 00 00
+01,我们通过printf函数打印的时候又因为计算机本来是小端字节序，
+会从右往左读就会是01 00 00 7f了，因为相当于inet_pton这个函数帮我们做了一次htonl()。
+</code></pre>
+
+<p>这就是为什么INADDR_LOOPBACK被定义为0x7f000001,却任然需要显示调用htonl(),<br/>
+而通过inet_pton()函数转换过的地址不能调用inet_htonl()的原因了.<br/>
+非常感谢laeder礼刚平时对我的帮助，良师益友，虽然我们再过1个多来月就要各奔东西了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[socket编程遇到字节排序的诡异问题]]></title>
@@ -132,7 +314,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.
+<p>然后始bind不上,找了半天原因，我电脑主机字节序默认是按小端字节排序的.<br/>
 如何检查自己的系统的主机字节序很简单：</p>
 
 <figure class='code'><figcaption><span>main.c </span></figcaption>
@@ -199,8 +381,8 @@
 </span><span class='line'>    #endif /* INADDR_NONE */</span></code></pre></td></tr></table></div></figure>
 
 
-<p>默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。
-但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。
+<p>默认都是按小端存储的，其实ANY和NONE怎么都一样,每个位都是一样的，容易出错的就在于LOOPBACK这个回环网卡地址是必须显示调用htonl()函数转换才能使用。<br/>
+但是最让我奇怪的是：为什么pton()函数返回的值是按大端排序的,很是奇怪，也就是说通过pton()函数转换过的地址不能调用htonl()函数转换，否则会出错。<br/>
 下面给段demo程序：</p>
 
 <figure class='code'><figcaption><span>demo.c </span></figcaption>
@@ -235,8 +417,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>翻过pton()和memcpy(),aton()函数源码还是没找到.
-记录到这里，以免以后忘了，有空再研究.</p>
+<p>翻过pton()和memcpy()函数源码还是没找到.<br/>
+记录到这里，以免以后忘了，有空再研究.<br/>
+备注：已解决,<a href="http://www.fightingman.org/blog/2014/05/13/big-and-little-endian-in-inet_pton/">地址</a></p>
 ]]></content>
   </entry>
   
@@ -1825,48 +2008,6 @@ TO solve it, you must set value of base_url in config.php</p>
 
 
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Abstract class &amp; pure interface]]></title>
-    <link href="http://FightingMan.github.com/blog/2012/11/13/abstract-class-and-pure-interface/"/>
-    <updated>2012-11-13T01:04:00+08:00</updated>
-    <id>http://FightingMan.github.com/blog/2012/11/13/abstract-class-and-pure-interface</id>
-    <content type="html"><![CDATA[<p>Interface and abstract class provide more structured way to seprate interface from implemention.Java support this mechanisms directly.</p>
-
-<p>Abstract class and methods.</p>
-
-<blockquote><p>A method that is incomplete; it has only a declaration and no method body.</p>
-
-<pre><code>abstract void foo();
-</code></pre>
-
-<p>A class contains abstract methods is called abstract class.</p>
-
-<pre><code>abstract class bar{}
-</code></pre>
-
-<p>If you inherit from an abstract class and you want to make objects of new type, you must provide method definitions for all the abstract methods in the base class. If you don&#8217;t, then the derived class is also abstract, so you can&#8217;t new the abstract class,or make object of it.</p>
-
-<p>An abstract class is a class either,so you can use extends keyword.</p></blockquote>
-
-<!--more-->
-
-
-<p>Interface.</p>
-
-<blockquote><p>The interface keyword just take the concept of abstractness one stp further which means the interface keyword produces a completely abstract class, ont that provides no implementation at all.it allows the creator to determine method names, argument lists, and return types, but no method bodies.The fiedls in it will be implicitly with static and final.</p>
-
-<p>You can choose to explicitly declare the method in an interface as public, but they are public even if you don&#8217;t say it.So when you implement an interface, the methods from interface must be defined as public which means you can&#8217;t use other keywords or give it package access in the implementation.</p>
-
-<pre><code>interface bar{}
-</code></pre>
-
-<p>If you want to implement it.You just allowed to use implements keyword.</p>
-
-<pre><code>class foo implements bar{} //Note: you must implements all the methods in the interface:bar,also this class can be abstract.
-</code></pre></blockquote>
 ]]></content>
   </entry>
   

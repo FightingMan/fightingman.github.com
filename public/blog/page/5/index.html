@@ -9,7 +9,7 @@
   <meta name="author" content="FightingMan">
 
   
-  <meta name="description" content="Covariant return types An overridden method in a derived class can return a type derived from the type returned by the base class method. &hellip;">
+  <meta name="description" content="Interface and abstract class provide more structured way to seprate interface from implemention.Java support this mechanisms directly. Abstract class &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,65 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/13/abstract-class-and-pure-interface/">Abstract Class &amp; Pure Interface</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-13T01:04:00+08:00" pubdate data-updated="true">Nov 13<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/13/abstract-class-and-pure-interface/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Interface and abstract class provide more structured way to seprate interface from implemention.Java support this mechanisms directly.</p>
+
+<p>Abstract class and methods.</p>
+
+<blockquote><p>A method that is incomplete; it has only a declaration and no method body.</p>
+
+<pre><code>abstract void foo();
+</code></pre>
+
+<p>A class contains abstract methods is called abstract class.</p>
+
+<pre><code>abstract class bar{}
+</code></pre>
+
+<p>If you inherit from an abstract class and you want to make objects of new type, you must provide method definitions for all the abstract methods in the base class. If you don&#8217;t, then the derived class is also abstract, so you can&#8217;t new the abstract class,or make object of it.</p>
+
+<p>An abstract class is a class either,so you can use extends keyword.</p></blockquote>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/11/13/abstract-class-and-pure-interface/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -417,51 +476,6 @@ the bass class without change the third class&#8217;s method.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/25/final-keyword/">Final Keyword</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-25T19:29:00+08:00" pubdate data-updated="true">Oct 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/25/final-keyword/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Final data:java&#8217;s constant,it can be fold into any calculation at run-time,the calculation can be perfomed at compile-time,eliminating some run-time overhead.Constants must be primitives and are expressed with the final keyword.With a primitive,final makes the value a constant,but with an object reference,final makes the reference a constant, it means it can never be changed to point to another object,however,the object itself can be modified;final data doesn&#8217;t mean that its value is known at compile time,it can be initialized at run time(eg. give a randomly value).Java allows the creation of blank finals,which are fields that are declared as final but are not given an initialization value,but it must be initialized before it is used.A field that is both static and final has only one piece of storage that cannot be changed.</p>
-
-<p>Final argument:java allows us to make arguments final by declaring them as such in the argument list.This feature is primaruly used to pass data to anonymous inner classes.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/10/25/final-keyword/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -477,6 +491,10 @@ the bass class without change the third class&#8217;s method.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/">big and little endian in inet_pton()</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/13/doubt-of-host-byte-order/">socket编程遇到字节排序的诡异问题</a>
@@ -512,10 +530,6 @@ the bass class without change the third class&#8217;s method.</p>
     
       <li class="post">
         <a href="/blog/2012/12/01/example-of-sharding-cluster/">Example of sharding cluster</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/29/a-storiette/">A storiette</a>
       </li>
     
   </ul>

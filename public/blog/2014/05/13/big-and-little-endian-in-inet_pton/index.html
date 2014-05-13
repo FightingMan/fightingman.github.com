@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>FightingMan's FootPrints</title>
+  <title>big and little endian in inet_pton() - FightingMan's FootPrints</title>
   <meta name="author" content="FightingMan">
 
   
@@ -30,7 +30,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://FightingMan.github.com/">
+  <link rel="canonical" href="http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton/">
   <link href="http://www.gnu.org/graphics/gnu-head-mini.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,15 +74,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/">Big and Little Endian in Inet_pton()</a></h1>
+      <h1 class="entry-title">Big and Little Endian in Inet_pton()</h1>
     
     
       <p class="meta">
@@ -100,14 +97,14 @@
 
 <time datetime="2014-05-13T21:42:00+08:00" pubdate data-updated="true">May 13<span>th</span>, 2014</time>
         
-         | <a href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今天弄懂了昨天那篇文章<a href="http://www.fightingman.org/blog/2014/05/13/doubt-of-host-byte-order/">Socket编程遇到字节排序的诡异问题</a>里的疑惑:</p>
+<div class="entry-content"><p>今天弄懂了昨天那篇文章<a href="http://www.fightingman.org/blog/2014/05/13/doubt-of-host-byte-order/">Socket编程遇到字节排序的诡异问题</a>里的疑惑:</p>
 
 <figure class='code'><figcaption><span>main.c </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -267,137 +264,31 @@
 
 
 
+<!--more-->
+
+
+<p>看到inet_pton4函数里面实际是按127.0.0.1的顺序直接存到内存的：</p>
+
+<pre><code>127.0.0.1转为网码为7f 00 00 01 ，由于我电脑是pc是小端，
+将这个变量写到变量里会存为 01 00 00 7f,但是这个函数直接通过内存地址存入的7f 00 00
+01,我们通过printf函数打印的时候又因为计算机本来是小端字节序，
+会从右往左读就会是01 00 00 7f了，因为相当于inet_pton这个函数帮我们做了一次htonl()。
+</code></pre>
+
+<p>这就是为什么INADDR_LOOPBACK被定义为0x7f000001,却任然需要显示调用htonl(),<br/>
+而通过inet_pton()函数转换过的地址不能调用inet_htonl()的原因了.<br/>
+非常感谢laeder礼刚平时对我的帮助，良师益友，虽然我们再过1个多来月就要各奔东西了。</p>
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/05/13/big-and-little-endian-in-inet_pton/">Read on &rarr;</a>
-    </footer>
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/13/doubt-of-host-byte-order/">Socket编程遇到字节排序的诡异问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">FightingMan</span></span>
 
-<time datetime="2014-05-13T03:00:00+08:00" pubdate data-updated="true">May 13<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/05/13/doubt-of-host-byte-order/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>通常大家这样绑定某个地址</p>
-
-<figure class='code'><figcaption><span>server.cpp </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="p">...</span>
-</span><span class='line'>    <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果网卡多，只想在某一网卡的某个地址上bind怎么办呢？就需要指定s_addr的地址
-比如:192.168.1.102</p>
-
-<figure class='code'><figcaption><span>main.cpp </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'>    <span class="c1">//main.cpp</span>
-</span><span class='line'>    <span class="n">include</span> <span class="o">&lt;</span><span class="n">iostream</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="cp">#include &quot;server.h&quot;</span>
-</span><span class='line'>    <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">try</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">)</span>  <span class="p">{</span>
-</span><span class='line'>                <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Usage: ftsrv &lt;address&gt; &lt;port&gt; &lt;doc_root&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-</span><span class='line'>                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="n">ftsrv</span><span class="o">::</span><span class="n">server</span> <span class="n">s</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
-</span><span class='line'>            <span class="n">s</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">cerr</span> <span class="o">&lt;&lt;</span>
-</span><span class='line'>                <span class="s">&quot;exception:&quot;</span> <span class="o">&lt;&lt;</span><span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span><span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">return0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">//server.h</span>
-</span><span class='line'>    <span class="p">...</span>
-</span><span class='line'>    <span class="k">explicit</span> <span class="n">server</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">address_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">port_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">doc_root_</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/05/13/doubt-of-host-byte-order/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/04/24/short-notes/">Short Notes</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -409,179 +300,55 @@
   
 
 
-<time datetime="2014-04-24T00:11:00+08:00" pubdate data-updated="true">Apr 24<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/04/24/short-notes/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>好记性不如烂笔头，很久没写博客了，重新开始吧。
-我这种半路出家的酱油程序员，最近看算法学习了很多东西,很多东西有耳目一醒的感觉。
-今天看到一道题，对位的操作算是，第一次比较熟悉的用了下：</p>
-
-<pre><code>如何判断n的第i位是否为1：n &amp; (1 &lt;&lt; i).
-</code></pre>
-
-<p>顺便想了下之前对位操作的总结：</p>
-
-<pre><code>按位与通常用来将变量中的某些位清0同时保留某些位不变: n &amp;= 0xffffff00,低八位全为0.
-按位或通常用来将变量中得某些位设置为1同时保留某些位不变：n |= 0xff,低八位全为1.
-按位异或有个特点：a ^ b === c =&gt; c ^ b == a &amp; c ^ a == b.可以快速简单的加解密.
-左移n位就等于乘以2的n次方.
-右移n位就等于除以2的n次方，并且将结果往小里取.
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2014-05-13T21:42:00+08:00" pubdate data-updated="true">May 13<span>th</span>, 2014</time>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/10/22/a-trap-in-php-base-convert/">A Trap in Php Base_convert</a></h1>
-    
-    
-      <p class="meta">
-        
 
-
-
-
-
-
-
-
+<span class="categories">
   
+    <a class='category' href='/blog/categories/c-c-/'>C/C++</a>, <a class='category' href='/blog/categories/tcp-ip/'>Tcp/Ip</a>
+  
+</span>
 
 
-<time datetime="2013-10-22T01:37:00+08:00" pubdate data-updated="true">Oct 22<span>nd</span>, 2013</time>
-        
-         | <a href="/blog/2013/10/22/a-trap-in-php-base-convert/#disqus_thread">Comments</a>
-        
-      </p>
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>Today I find an interesting thing: a php function <a href="http://us1.php.net/manual/en/function.base-convert.php">base_convert</a></p>
-
-<figure class='code'><figcaption><span>convert.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>No surprises:</p>
-
-<pre><code>string(9) "100101000"
-</code></pre>
-
-<p>Let&#8217;s go on!</p>
-
-<figure class='code'><figcaption><span>convert.php </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$a = 0x80;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($a, 16, 2));</span>
-</span><span class='line'><span class="x">$b = ~$a;</span>
-</span><span class='line'><span class="x">var_dump(base_convert($b, 16, 2), $b);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>output:</p>
-
-<pre><code>string(9) "100101000"
-string(9) "100101001"
-int(-129)
-</code></pre>
-
-<p>Hmm,it seems strange that binary <em><strong>100101001</strong></em> not equas decimal <em><strong>-129</strong></em>, but the result: -129 is the right answer,what happened?</p>
-
+      <div class="sharing">
+  
+  
+  
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/10/22/a-trap-in-php-base-convert/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/13/shell-tips-with-ctrl-plus/">Shell Tips With Ctrl+(?)</a></h1>
-    
-    
-      <p class="meta">
-        
+        <a class="basic-alignment left" href="/blog/2014/05/13/doubt-of-host-byte-order/" title="Previous Post: socket编程遇到字节排序的诡异问题">&laquo; socket编程遇到字节排序的诡异问题</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite">        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'ftman'; // required: replace example with your forum shortname
 
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-13T23:59:00+08:00" pubdate data-updated="true">Mar 13<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/13/shell-tips-with-ctrl-plus/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>There are some handy operator with command line:</p>
-
-<pre><code>[Ctrl-d] #This exits shell or closes input on programs waiting for STDIN.NOTE: there must be no such thing as an end of file character.
-[Ctrl-z] #This suspend a process u r running in foreground. Get it back by running 'fg', background it using 'bg'.
-[Ctrl-c] #This canceling a running program,Ctrl-C can be used before you run cammand to "cancel" the line edit and start anew.
-[Ctrl-b] #Move to the begging of the current or previous word. NOTE: base on keyboard mapping sometimes.
-[Ctrl-f] #Move to the end of the current or next word. NOTE: base on keyboard mapping sometimes.
-[Ctrl-w] #Remove the previous word.
-[Ctrl-l] #Clear screen.
-[Ctrl-K] #Delete/Yank everything from cursor to the end of line.
-[Ctrl-U] #Delete/Yank everything from cursor to the begging of the line.
-[Ctrl-e] #Move your cursor to the end of the line.
-[Ctrl-a] #move your cursor to the begging of the line.
-[Ctrl-r] #Reverse search through your command history for 'input'. ESC when done.
-[Ctrl--] #Manial lists this as Ctrl-_ but Ctrl-- ususally works too.Incremental undo of command line edits.
-</code></pre>
-
-<p>Look forward to your supplementary :).</p>
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </div>
-  
-  
+  </section>
 
-
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/blog/page/2/">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -634,7 +401,7 @@ int(-129)
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/FightingMan">@FightingMan</a> on GitHub
@@ -679,6 +446,7 @@ int(-129)
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -693,7 +461,10 @@ int(-129)
       var disqus_shortname = 'ftman';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton/';
+        var disqus_url = 'http://FightingMan.github.com/blog/2014/05/13/big-and-little-endian-in-inet_pton/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
