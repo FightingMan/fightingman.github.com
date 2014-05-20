@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Tcp/Ip | FightingMan's FootPrints]]></title>
   <link href="http://FightingMan.github.com/blog/categories/tcp-ip/atom.xml" rel="self"/>
   <link href="http://FightingMan.github.com/"/>
-  <updated>2014-05-13T22:23:35+08:00</updated>
+  <updated>2014-05-20T14:52:38+08:00</updated>
   <id>http://FightingMan.github.com/</id>
   <author>
     <name><![CDATA[FightingMan]]></name>
@@ -134,7 +134,7 @@ return (1);
 
 <p>这就是为什么INADDR_LOOPBACK被定义为0x7f000001,却任然需要显示调用htonl(),<br/>
 而通过inet_pton()函数转换过的地址不能调用inet_htonl()的原因了.<br/>
-非常感谢laeder礼刚平时对我的帮助，良师益友，虽然我们再过1个多来月就要各奔东西了。</p>
+非常感谢leader礼刚平时对我的帮助，良师益友，虽然我们再过1个多来月就要各奔东西了。</p>
 ]]></content>
   </entry>
   
